@@ -21,14 +21,12 @@
                         "type": "object",
                         "properties": {
                             "role": {
-                                "enum": [
-                                    "user",
-                                    "assistant"
-                                ],
-                                "description": "The role of the message sender must alternate between 'user' and 'assistant'."
+                                "type": "string",
+                                "description": "The role of the message sender (e.g., 'user', 'assistant', 'system', 'tool')."
                             },
                             "content": {
                                 "type": "string",
+                                "maxLength": 131072,
                                 "description": "The content of the message as a string."
                             }
                         },
