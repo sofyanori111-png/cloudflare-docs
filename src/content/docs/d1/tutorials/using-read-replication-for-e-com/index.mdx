@@ -30,7 +30,9 @@ If you want to skip the steps and get started quickly, click on the below button
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/harshil1712/e-com-d1-hono)
 
-This will create a repository in your GitHub account and deploy the application to Cloudflare Workers. It will also create and bind a D1 database, create the required tables, add some sample data, and activate read replication. You can then visit the deployed application.
+This will create a repository in your GitHub account and deploy the application to Cloudflare Workers. It will also create and bind a D1 database, create the required tables, add some sample data. During deployment, tick the `Enable read replication` box to activate read replication.
+
+You can then visit the deployed application.
 
 ## Prerequisites
 
@@ -61,6 +63,13 @@ npm install hono
 ## Step 2: Update the frontend
 
 The above step creates a new Workers project with a default frontend and installs Hono. You will update the frontend to list the products. You will also add a new page to the frontend to display a single product.
+
+Navigate to the newly created Worker project folder.
+
+```sh
+cd fast-commerce
+```
+
 
 Update the `public/index.html` file to list the products. Use the below code as a reference.
 
@@ -740,7 +749,7 @@ npm run dev
 
 Navigate to `http://localhost:8787. You should see the products listed. Click on a product to view the product details.
 
-To insert a new product, use the following command:
+To insert a new product, use the following command (while the development server is running):
 
 ```sh
 curl -X POST http://localhost:8787/api/product \
