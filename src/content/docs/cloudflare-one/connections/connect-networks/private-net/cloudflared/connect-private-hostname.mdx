@@ -45,6 +45,17 @@ This section covers how to enable remote access to a private hostname applicatio
 
 ### 1. Connect the server to Cloudflare
 
+Hostname must be unique for an account (1:M mapping from hostname to Tunnel)
+
+	<Details header="Hostname format restrictions">
+			- Less than 255 characters
+			- Leading wildcards (`*`) and dots (`.`) are allowed but trimmed off. For example, `*.internal.local` becomes `internal.local`.
+			- Ending dots (`.`) are allowed but trimmed off.
+			- No wildcards (`*`) in the middle. For example, `foo*bar.internal.local` is not allowed.
+			- Hostnames with non-Latin characters must be Punycode encoded and include the [ACE prefix](https://en.wikipedia.org/wiki/Punycode#ACE_prefix_for_internationalized_domain_names). For example, to represent `例.internal.local`, enter `xn--fsq.internal.local`.
+	</Details>
+
+
 ### 2. Set up the client
 
 <Details header="Feature availability">
