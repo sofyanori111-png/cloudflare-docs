@@ -45,7 +45,9 @@ This section covers how to enable remote access to a private hostname applicatio
 
 ### 1. Connect the server to Cloudflare
 
-Hostname must be unique for an account (1:M mapping from hostname to Tunnel)
+<Render file="tunnel/create-tunnel"/>
+
+9. In the **Hostname routes** tab, enter the fully qualified domain name (FDQN) that represents your application (for example, `wiki.internal.local`).
 
 	<Details header="Hostname format restrictions">
 			- Less than 255 characters
@@ -55,6 +57,7 @@ Hostname must be unique for an account (1:M mapping from hostname to Tunnel)
 			- Hostnames with non-Latin characters must be Punycode encoded and include the [ACE prefix](https://en.wikipedia.org/wiki/Punycode#ACE_prefix_for_internationalized_domain_names). For example, to represent `例.internal.local`, enter `xn--fsq.internal.local`.
 	</Details>
 
+10. Select **Complete setup**.
 
 ### 2. Set up the client
 
