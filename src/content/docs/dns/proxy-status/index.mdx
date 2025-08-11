@@ -102,3 +102,6 @@ In addition to potentially exposing your origin IP addresses to bad actors and [
 Service providers might require to create a DNS verification record, usually a TXT or CNAME record.
 In the case of a CNAME record, it needs to be set to DNS-only on the Cloudflare Dashboard: your service provider needs to be able to resolve this record to the value they've asked you to configure.
 As proxied records will return Cloudflare IPs, verification CNAME needs to be set to DNS-only.
+
+[CNAME flattening](/dns/cname-flattening/) also may interfere in the verification process: it is recommended to disable CNAME flattening if you need to set up verification CNAME records.
+
