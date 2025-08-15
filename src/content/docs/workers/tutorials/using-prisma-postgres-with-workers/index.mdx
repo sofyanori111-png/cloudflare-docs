@@ -10,15 +10,29 @@ tags:
   - PostgreSQL
 ---
 
-import { PackageManagers } from "~/components";
+import { PackageManagers, Tabs, TabItem, Render } from "~/components";
 
 [Prisma Postgres](https://www.prisma.io/postgres) is a managed, serverless PostgreSQL database. It supports features like connection pooling, caching, real-time subscriptions, and query optimization recommendations.
+
+:::note
+
+You can connect to Prisma Postgres using [Prisma Accelerate](https://www.prisma.io/accelerate) or [Hyperdrive](/hyperdrive). Both approaches provide comparable performance with different tradeoffs.
+
+Prisma Accelerate provides connection pooling and caching specifically designed for connecting to Prisma Postgres with the [Prisma ORM](https://www.prisma.io/), improving database access from Workers with built-in optimizations for the Prisma ecosystem.
+
+Hyperdrive provides the lowest possible latencies when connecting to external databases from Workers, allows you to use any standard PostgreSQL driver, and is included in all Workers plans. Hyperdrive performs connection pooling across Cloudflare's network and supports native database drivers, libraries, and ORMs. Learn more about Hyperdrive in [How Hyperdrive Works](/hyperdrive/configuration/how-hyperdrive-works/).
+
+:::
+
+<Tabs>
+	<TabItem label="Prisma Accelerate">
 
 In this tutorial, you will learn how to:
 
 - Set up a Cloudflare Workers project with [Prisma ORM](https://www.prisma.io/docs).
 - Create a Prisma Postgres instance from the Prisma CLI.
 - Model data and run migrations with Prisma Postgres.
+- Connect to the database using Prisma Accelerate.
 - Query the database from Workers.
 - Deploy the Worker to Cloudflare.
 
@@ -142,7 +156,7 @@ After these steps are complete, Prisma ORM is fully set up and connected to your
 
 ## 3. Develop the application
 
-Modify the `src/index.ts` file and replace its contents with the following code:
+Modify the `src/index.ts` file to use Prisma Postgres with Prisma Accelerate:
 
 ```ts title="src/index.ts"
 import { PrismaClient } from "@prisma/client/edge";
@@ -163,6 +177,7 @@ export default {
 				},
 			});
 
+		// Connect to Prisma Postgres using Accelerate
 		const prisma = new PrismaClient({
 			datasourceUrl: env.DATABASE_URL,
 		}).$extends(withAccelerate());
@@ -193,6 +208,7 @@ npm run dev
 Visit [`https://localhost:8787`](https://localhost:8787) to see your app display the following output:
 
 ```sh
+Created new user: Jon Doe (Jon123@gmail.com).
 Number of users in the database: 1
 ```
 
@@ -200,7 +216,7 @@ Every time you refresh the page, a new user is created. The number displayed wil
 
 ## 4. Deploy the application to Cloudflare
 
-When the application is deployed to Cloudflare, it needs access to the `DATABASE_URL` environment variable that is defined locally in `.dev.vars`. You can use the [`npx wrangler secret put`](/workers/configuration/secrets/#adding-secrets-to-your-project) command to upload the `DATABASE_URL` to the deployment environment:
+When using Prisma Accelerate, you need to add the `DATABASE_URL` as a secret. Use the [`npx wrangler secret put`](/workers/configuration/secrets/#adding-secrets-to-your-project) command:
 
 ```sh
 npx wrangler secret put DATABASE_URL
@@ -227,6 +243,253 @@ If you belong to multiple accounts, select the account where you want to deploy 
 :::
 
 Once the deployment completes, verify the deployment by visiting the live URL provided in the deployment output, such as `https://{PROJECT_NAME}.workers.dev`. If you encounter any issues, ensure the secrets were added correctly and check the deployment logs for errors.
+
+	</TabItem>
+	<TabItem label="Hyperdrive">
+
+In this tutorial, you will learn how to:
+
+- Set up a Cloudflare Workers project with [Prisma ORM](https://www.prisma.io/docs).
+- Create a Prisma Postgres instance from the Prisma CLI.
+- Model data and run migrations with Prisma Postgres.
+- Configure Hyperdrive for connection pooling.
+- Query the database from Workers using Hyperdrive.
+- Deploy the Worker to Cloudflare.
+
+## Prerequisites
+
+To follow this guide, ensure you have the following:
+
+- Node.js `v18.18` or higher installed.
+- An active [Cloudflare account](https://dash.cloudflare.com/).
+- A basic familiarity with installing and using command-line interface (CLI) applications.
+
+## 1. Create a new Worker project
+
+Begin by using [C3](/pages/get-started/c3/) to create a Worker project in the command line:
+
+```sh
+npm create cloudflare@latest prisma-postgres-worker -- --type=hello-world --ts=true --git=true --deploy=false
+```
+
+Then navigate into your project:
+
+```sh
+cd ./prisma-postgres-worker
+```
+
+Your initial `src/index.ts` file currently contains a simple request handler:
+
+```ts title="src/index.ts"
+export default {
+	async fetch(request, env, ctx): Promise<Response> {
+		return new Response("Hello World!");
+	},
+} satisfies ExportedHandler<Env>;
+```
+
+## 2. Setup Prisma in your project
+
+In this step, you will set up Prisma ORM with a Prisma Postgres database using the CLI. Then you will create and execute helper scripts to create tables in the database and generate a Prisma client to query it.
+
+### 2.1. Install required dependencies
+
+Install Prisma CLI as a dev dependency:
+
+<PackageManagers pkg="prisma" dev />
+
+Install the [`dotenv-cli` package](https://www.npmjs.com/package/dotenv-cli) to load environment variables from `.dev.vars`:
+
+<PackageManagers pkg="dotenv-cli" dev />
+
+Install the `pg` driver for use with Hyperdrive:
+
+<PackageManagers pkg="pg@>8.13.0" />
+
+If using TypeScript, install the types package:
+
+<PackageManagers pkg="@types/pg" dev />
+
+### 2.2. Create a Prisma Postgres database and initialize Prisma
+
+Initialize Prisma in your application:
+
+<PackageManagers type="dlx" pkg="prisma@latest" args="init --db" />
+
+If you do not have a [Prisma Data Platform](https://console.prisma.io/) account yet, or if you are not logged in, the command will prompt you to log in using one of the available authentication providers. A browser window will open so you can log in or create an account. Return to the CLI after you have completed this step.
+
+Once logged in (or if you were already logged in), the CLI will prompt you to select a project name and a database region.
+
+Once the command has terminated, it will have created:
+
+- A project in your [Platform Console](https://console.prisma.io/) containing a Prisma Postgres database instance.
+- A `prisma` folder containing `schema.prisma`, where you will define your database schema.
+- An `.env` file in the project root, which will contain the Prisma Postgres database url `DATABASE_URL=<your-prisma-postgres-database-url>`.
+
+Note that Cloudflare Workers do not support `.env` files. You will use a file called `.dev.vars` instead of the `.env` file that was just created.
+
+### 2.3. Prepare environment variables
+
+Rename the `.env` file in the root of your application to `.dev.vars` file:
+
+```sh
+mv .env .dev.vars
+```
+
+### 2.4. Apply database schema changes
+
+Open the `schema.prisma` file in the `prisma` folder and add the following `User` model to your database:
+
+```prisma title="prisma/schema.prisma"
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id  Int @id @default(autoincrement())
+  email String
+	name 	String
+}
+```
+
+Next, add the following helper scripts to the `scripts` section of your `package.json`:
+
+```json title="package.json"
+"scripts": {
+  "migrate": "dotenv -e .dev.vars -- npx prisma migrate dev",
+	"generate": "dotenv -e .dev.vars -- npx prisma generate --no-engine",
+	"studio": "dotenv -e .dev.vars -- npx prisma studio",
+  // Additional worker scripts...
+}
+```
+
+Run the migration script to apply changes to the database:
+
+```sh
+npm run migrate
+```
+
+When prompted, provide a name for the migration (for example, `init`).
+
+After these steps are complete, Prisma ORM is fully set up and connected to your Prisma Postgres database.
+
+## 3. Configure Hyperdrive
+
+Create a Hyperdrive configuration that connects to your Prisma Postgres database. Replace the connection string with your actual Prisma Postgres connection string from `.dev.vars`:
+
+```sh
+npx wrangler hyperdrive create prisma-postgres-hyperdrive --connection-string="postgres://your-connection-string-here"
+```
+
+:::note
+
+When configuring Hyperdrive for Prisma Postgres, set the maximum connections to 15 to stay within Prisma Postgres connection limits. You can configure this in the Cloudflare dashboard under Hyperdrive settings, or contact support if you need to adjust connection pooling settings.
+
+:::
+
+Add the Hyperdrive binding to your `wrangler.toml` file, along with the required Node.js compatibility settings:
+
+```toml title="wrangler.toml"
+name = "prisma-postgres-worker"
+main = "src/index.ts"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+[[hyperdrive]]
+binding = "HYPERDRIVE"
+id = "your-hyperdrive-id-here"
+```
+
+## 4. Develop the application
+
+Modify the `src/index.ts` file to use Hyperdrive with Prisma:
+
+```ts title="src/index.ts"
+import { PrismaClient } from "@prisma/client/edge";
+
+export interface Env {
+	HYPERDRIVE: Hyperdrive;
+}
+
+export default {
+	async fetch(request, env, ctx): Promise<Response> {
+		const path = new URL(request.url).pathname;
+		if (path === "/favicon.ico")
+			return new Response("Resource not found", {
+				status: 404,
+				headers: {
+					"Content-Type": "text/plain",
+				},
+			});
+
+		// Use Hyperdrive connection string with Prisma
+		const prisma = new PrismaClient({
+			datasourceUrl: env.HYPERDRIVE.connectionString,
+		});
+
+		const user = await prisma.user.create({
+			data: {
+				email: `Jon${Math.ceil(Math.random() * 1000)}@gmail.com`,
+				name: "Jon Doe",
+			},
+		});
+
+		const userCount = await prisma.user.count();
+
+		return new Response(`\
+Created new user: ${user.name} (${user.email}).
+Number of users in the database: ${userCount}.
+		`);
+	},
+} satisfies ExportedHandler<Env>;
+```
+
+:::note
+
+Hyperdrive allows you to use any standard PostgreSQL driver, not just Prisma ORM. You can also use `node-postgres` directly or `postgres.js`. The globally distributed nature of Hyperdrive provides the lowest possible latencies by performing connection pooling across Cloudflare's network.
+
+:::
+
+Run the development server:
+
+```sh
+npm run dev
+```
+
+Visit [`https://localhost:8787`](https://localhost:8787) to see your app display the following output:
+
+```sh
+Created new user: Jon Doe (Jon123@gmail.com).
+Number of users in the database: 1
+```
+
+Every time you refresh the page, a new user is created. The number displayed will increment by `1` with each refresh as it returns the total number of users in your database.
+
+## 5. Deploy the application to Cloudflare
+
+If you're using Hyperdrive, your Hyperdrive configuration is already linked in your `wrangler.toml` file, so no additional secrets are needed. Simply deploy your project:
+
+```sh
+npm run deploy
+```
+
+The `wrangler` CLI will bundle and upload your application.
+
+If you are not already logged in, the `wrangler` CLI will open a browser window prompting you to log in to the [Cloudflare dashboard](https://dash.cloudflare.com/).
+
+:::note
+If you belong to multiple accounts, select the account where you want to deploy the project.
+:::
+
+Once the deployment completes, verify the deployment by visiting the live URL provided in the deployment output, such as `https://{PROJECT_NAME}.workers.dev`. If you encounter any issues, ensure the secrets were added correctly and check the deployment logs for errors.
+
+	</TabItem>
+</Tabs>
 
 ## Next steps
 

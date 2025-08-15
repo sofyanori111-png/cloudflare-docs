@@ -9,20 +9,16 @@ import { Render, PackageManagers, Tabs, TabItem } from "~/components";
 
 :::note
 
-You can connect to PlanetScale using [Hyperdrive](/hyperdrive) (recommended), or using the PlanetScale serverless driver, `@planetscale/database`. Both provide connection pooling and reduce the amount of round trips required to create a secure connection from Workers to your database.
+You can connect to PlanetScale using the PlanetScale serverless driver, `@planetscale/database`, or [Hyperdrive](/hyperdrive). Both approaches provide comparable performance with different tradeoffs.
 
-Hyperdrive can provide lower latencies because it performs the database connection setup and connection pooling across Cloudflare's network. Hyperdrive supports native database drivers, libraries, and ORMs, and is included in all [Workers plans](/hyperdrive/platform/pricing/). Learn more about Hyperdrive in [How Hyperdrive Works](/hyperdrive/configuration/how-hyperdrive-works/).
+The PlanetScale serverless driver provides connection pooling and is designed specifically for PlanetScale's platform, offering simplicity and built-in optimizations for the PlanetScale ecosystem.
+
+Hyperdrive provides the lowest possible latencies due to its globally distributed nature and allows you to use any standard MySQL driver. Hyperdrive performs database connection setup and connection pooling across Cloudflare's network and supports native database drivers, libraries, and ORMs. Learn more about Hyperdrive in [How Hyperdrive Works](/hyperdrive/configuration/how-hyperdrive-works/).
 
 :::
 
 <Tabs>
-	<TabItem label="Hyperdrive (recommended)">
-
-To connect to PlanetScale using [Hyperdrive](/hyperdrive), follow these steps:
-
-         <Render file="planetscale-partial" product="hyperdrive"/>
-    </TabItem>
-    <TabItem label="PlanetScale serverless driver">
+	<TabItem label="PlanetScale serverless driver">
 
 ## Set up an integration with PlanetScale
 
@@ -103,5 +99,12 @@ To set up an integration with PlanetScale:
 
 To learn more about PlanetScale, refer to [PlanetScale's official documentation](https://docs.planetscale.com/).
 
-</TabItem>
+	</TabItem>
+	<TabItem label="Hyperdrive">
+
+To connect to PlanetScale using [Hyperdrive](/hyperdrive), follow these steps:
+
+<Render file="planetscale-partial" product="hyperdrive"/>
+
+	</TabItem>
 </Tabs>
