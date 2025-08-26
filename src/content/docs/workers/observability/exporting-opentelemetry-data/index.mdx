@@ -1,0 +1,69 @@
+---
+pcx_content_type: concept
+title: Exporting OpenTelemetry Data
+sidebar:
+  order: 4
+---
+
+import { Badge, DirectoryListing } from "~/components";
+
+Cloudflare Workers supports exporting OpenTelemetry (OTel)-compliant telemetry data to any compatible destination, allowing you to integrate with your existing monitoring and observability stack. 
+
+### Supported telemetry types
+
+You can export the following types of telemetry data:
+
+- **Traces** - Traces showing request flows through your Worker and connected services
+- **Logs** - Application logs including `console.log()` output and system-generated logs  
+- **Metrics** - Performance metrics and custom measurements (not yet supported - coming soon)
+
+### Supported destinations
+
+Cloudflare Workers can export data to any platform that supports the OpenTelemetry Protocol (OTLP), including:
+- Datadog
+- Honeycomb 
+- Grafana Cloud
+- Sentry 
+- Custom OTLP endpoints
+
+## Setting up OpenTelemetry-compatible destinations
+
+Before you can export telemetry data, you need to create and configure a destination in the Cloudflare dashboard.
+
+### Creating a destination
+
+1. Head to your account's Workers Observability section of the dashboard and add a new destination. 
+2. **Configure your destination:**
+   - **Destination Name** - A descriptive name (e.g., "Datadog APM", "Honeycomb Logs")
+   - **Destination Type** - Choose between "Traces" or "Logs"
+   - **OTLP Endpoint** - The URL where your observability platform accepts OTLP data. This endpoint should end in `/logs` or /traces`
+   - **Custom Headers** (Optional) - Add any authentication headers or other required headers
+
+## Enabling OpenTelemetry export for your Worker
+
+After setting up destinations in the dashboard, configure your Worker to export telemetry data by updating your `wrangler.jsonc` configuration.
+
+```jsonc title="wrangler.jsonc"
+{
+  "observability": {
+    "traces": {
+      "enabled": true,
+      "destinations": ["honeycomb-apm", "datadog-apm"],
+      "head_sample_rate": 0.05
+    },
+     
+    "logs": {
+      "enabled": true,
+      "destinations": ["datadog-logs", "honeycomb-logs"],
+      "head_sample_rate": 0.5
+    }
+  }
+}
+```
+Then redeploy your Worker for new configurations to take effect. 
+
+### Configuration options
+- **`enabled`** - Enable or disable telemetry collection
+- **`head_sample_rate`** - Percentage of requests to sample (0.0 to 1.0)
+- **`destinations`** - Array of destination names to export data to. These should be from the destination names created in the dashboard. Include `"cloudflare"` in this array to also send traces and logs to the Workers Dashboard. 
+
