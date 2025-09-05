@@ -64,13 +64,13 @@ You can configure this in your Wrangler configuration like this:
 
 {
     "tracing": {
-        //enables tracing (required field)
+      
         "enabled": true
-        "destinations": ["external", "cloudflare"]
+        "destinations": ["datadog"]
         // set tracing sampling rate to 5%
         "head_sample_rate": 0.05
     },
-    // optional override since {obs enabled:true}
+
     "logging": {
         "enabled": true
         // set logging sampling rate to 50%
