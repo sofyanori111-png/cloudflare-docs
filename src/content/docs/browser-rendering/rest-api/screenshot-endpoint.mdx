@@ -17,18 +17,10 @@ The `/screenshot` endpoint renders the webpage by processing its HTML and JavaSc
 
 Sets the HTML content of the page to `Hello World!` and then takes a screenshot. The option `omitBackground` hides the default white background and allows capturing screenshots with transparency.
 
-```bash
-curl -X POST 'https://api.cloudflare.com/client/v4/accounts/<accountId>/browser-rendering/screenshot' \
-  -H 'Authorization: Bearer <apiToken>' \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "html": "Hello World!",
-    "screenshotOptions": {
-      "omitBackground": true
-    }
-  }' \
-  --output "screenshot.png"
-```
+<Render
+  file="example-screenshot-from-url"
+  product="browser-rendering"
+/>
 
 </TabItem> <TabItem label="TypeScript SDK">
 
@@ -51,6 +43,18 @@ console.log(screenshot.status);
 ```
 
 </TabItem> </Tabs>
+
+### Capture a screenshot from a URL
+
+```bash
+curl -X POST 'https://api.cloudflare.com/client/v4/accounts/<accountId>/browser-rendering/screenshot' \
+  -H 'Authorization: Bearer <apiToken>' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "url": "https://www.cloudflare.com"
+  }' \
+  --output "screenshot.png"
+```
 
 For more options to control the final screenshot, like `clip`, `captureBeyondViewport`, `fullPage` and others, check the endpoint [reference](/api/resources/browser_rendering/subresources/screenshot/methods/create/).
 
@@ -82,7 +86,6 @@ curl -X POST 'https://api.cloudflare.com/client/v4/accounts/<accountId>/browser-
   }' \
   --output "authenticated-screenshot.png"
 ```
-
 
 ### Navigate and capture a full-page screenshot
 
