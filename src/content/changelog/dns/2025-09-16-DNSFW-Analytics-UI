@@ -3,12 +3,13 @@
 title: DNS Firewall Analytics — now in the Dashboard
 description: Quickly set up common rules with pre-built templates.
 date: 2025-09-16
-preview_image: DNSFW_Analytics_UI
 ---
 
 # What’s New
 
 Access [GraphQL-powered DNS Firewall analytics](https://developers.cloudflare.com/dns/dns-firewall/analytics/) directly in the Cloudflare dashboard.
+
+![DNS Firewall Analytics UI](~/assets/images/changelog/dns/DNSFW_Analytics_UI.png)
 
 ## Explore Four Interactive Panels
 
