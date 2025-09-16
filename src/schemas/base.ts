@@ -1,7 +1,7 @@
 import { z } from "astro:schema";
 import type { SchemaContext } from "astro:content";
 
-import { sidebar, SidebarIconSchema } from "./types/sidebar";
+import { sidebar } from "./types/sidebar";
 
 const spotlightAuthorDetails = z
 	.object({
@@ -143,7 +143,6 @@ export const baseSchema = ({ image }: SchemaContext) =>
 			.describe(
 				"Displays a [Banner](https://developers.cloudflare.com/style-guide/frontmatter/banner/) on the current docs page.",
 			),
-		icon: SidebarIconSchema(),
 		feedback: z
 			.boolean()
 			.default(true)
