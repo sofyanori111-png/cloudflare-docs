@@ -23,6 +23,10 @@ Because DNS requests subject to Local Domain Fallback bypass the Gateway resolve
 
 <Render file="aws-resolver" product="cloudflare-one" />
 
+### iOS
+
+On iOS, `.local` is not supported as a valid Local Domain Fallback domain. Apple reserves `.local` for [Bonjour and multicast DNS (mDNS)](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/NetServices/Articles/domainnames.html#//apple_ref/doc/uid/TP40002460-TPXREF117:~:text=in%20this%20case.-,Bonjour%20and%20the%20Local%20Link,-Bonjour%20protocols%20deal), and the WARP client cannot override this behavior.
+
 ## Manage local domains
 
 ### View domains
