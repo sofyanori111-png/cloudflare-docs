@@ -114,16 +114,31 @@ Wrangler supports two different versions of the Images API:
 
 To test the high-fidelity version of Images, you can run `wrangler dev`:
 
-```txt
+```sh
 npx wrangler dev
 ```
 
 This creates a local-only environment that mirrors the production environment where Cloudflare runs the Images API. You can test your Worker with all available transformation features before deploying to production.
 
-To test the low-fidelity offline version of Images, add the `--experimental-images-local-mode` flag:
+To test the low-fidelity offline version of Images, add the `--experimental-images-local-mode` flag when running `wrangler dev`:
 
-```txt
+```sh
 npx wrangler dev --experimental-images-local-mode
+```
+
+Or, set the `imagesLocalMode` experimental option to `true` in your Vite config if you are using the Cloudflare Vite plugin:
+
+```ts
+import { cloudflare } from "@cloudflare/vite-plugin";
+import { defineConfig } from "vite";
+
+export default defineConfig({
+	plugins: [
+		cloudflare({
+			experimental: { imagesLocalMode: true },
+		}),
+	],
+});
 ```
 
 Currently, this version supports only `width`, `height`, `rotate`, and `format`.
