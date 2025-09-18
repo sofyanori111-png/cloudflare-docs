@@ -9,9 +9,7 @@ sidebar:
 Only available on Enterprise plans. For more information, contact your account team.
 :::
 
-{/* TODO: Update the Orgs link with most up to date option */}
-
-Gateway supports using [Cloudflare Organizations](/fundamentals/organizations/) to share configurations between and apply specific policies to accounts within an organization. Tiered organizational policies support [DNS](/cloudflare-one/policies/gateway/dns-policies/), [network](/cloudflare-one/policies/gateway/network-policies/), [HTTP](/cloudflare-one/policies/gateway/http-policies/), and [resolver](/cloudflare-one/policies/gateway/resolver-policies/) policies.
+Gateway supports using [Cloudflare Organizations](/fundamentals/organizations/) to share configurations between and apply specific policies to accounts within an organization. Tiered Gateway policies with Organizations support [DNS](/cloudflare-one/policies/gateway/dns-policies/), [network](/cloudflare-one/policies/gateway/network-policies/), [HTTP](/cloudflare-one/policies/gateway/http-policies/), and [resolver](/cloudflare-one/policies/gateway/resolver-policies/) policies.
 
 ## Get started
 
@@ -24,6 +22,8 @@ To set up Cloudflare Organizations, refer to [Create an Organization](/fundament
 The Gateway Tenant platform supports tiered and siloed account configurations.
 
 ### Tiered accounts
+
+{/* TODO: Rename this section and check if siloed accounts are relevant (potentially fix H2 preamble above). Fix the flow to match Orgs config. */}
 
 In a tiered account configuration, a top-level source account enforces global security policies that apply to all of its recipient accounts. Recipient accounts can add policies as needed while still being managed by the source account. Organization owners can also configure recipient accounts independently from the source account, including:
 
@@ -64,6 +64,8 @@ flowchart TD
     n4@{ shape: lean-l}
     n5@{ shape: lean-l}
 ```
+
+{/* TODO: Decide best way to surface limitations. Separate section? */}
 
 :::caution[Limitations]
 Tiered policies do not support egress policies, device posture selectors, private apps, or virtual networks.
