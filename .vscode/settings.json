@@ -2,6 +2,11 @@
 	"astro.content-intellisense": true,
 	"editor.formatOnSave": true,
 	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"[mdx]": {
+		// MDX prettier formatting is quite broken and simply breaks
+		// formatting, so we don't auto format MDX files
+		"editor.defaultFormatter": null
+	},
 	"typescript.tsdk": "node_modules/typescript/lib",
 	"cSpell.enableFiletypes": ["mdx"],
 	"files.associations": { "__redirects": "plaintext", "_headers": "plaintext" }
