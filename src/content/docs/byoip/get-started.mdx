@@ -75,7 +75,8 @@ curl https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/addressing/prefix
 
 ```
 
-2. Validate prefix ownership using one of the following methods:
+2. Take note of the `id` assigned to the prefix you added. It will be used in future steps.
+3. Validate prefix ownership using one of the following methods:
 
 <Tabs> <TabItem label="Modify IRR record">
 
@@ -147,13 +148,15 @@ When you onboard your IP prefixes to Cloudflare, there must be one service bindi
 Magic Transit can only be used as default binding, spanning across your entire prefix. You can then add CDN or Spectrum bindings for smaller subnets but not the other way around. For details refer to [service bindings scope](/byoip/service-bindings/#scope).
 :::
 
-1. Make a `POST` request to the [Create service binding](/api/resources/addressing/subresources/prefixes/subresources/service_bindings/methods/create/) endpoint, indicating the entire BYOIP prefix that you are onboarding and the service that should be used for your default binding.
+1. Make a `GET` request to the [List Services](/api/resources/addressing/subresources/services/methods/list/) endpoint and take note of the `id` associated with the service you want to use.
+2. (Optional) If needed, use the [List Prefixes](/api/resources/addressing/subresources/prefixes/methods/list/) endpoint to get or confirm the `id` associated with your prefix.
+3. Make a `POST` request to the [Create service binding](/api/resources/addressing/subresources/prefixes/subresources/service_bindings/methods/create/) endpoint, indicating the entire BYOIP prefix that you are onboarding and the service that should be used for your default binding.
 
 <APIRequest
 path="/accounts/{account_id}/addressing/prefixes/{prefix_id}/bindings"
 method="POST"
 json={{
-"cidr": "<ENTIRE_BYOIP_PREFIX>",
+"cidr": "203.0.113.0/24",
 "service_id": "<DEFAULT_SERVICE>"
 }}
 />
