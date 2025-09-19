@@ -1,0 +1,207 @@
+---
+title: Access private API
+pcx_content_type: example
+---
+
+import { Tabs, TabItem } from "~/components";
+
+:::note
+This example demonstrates how to access a private REST API that's not exposed to the public internet.
+:::
+
+## Overview
+
+This example shows how to:
+
+- Configure a VPC Service for your internal API
+- Create a Worker that acts as a secure gateway
+- Add authentication and request transformation
+
+## Prerequisites
+
+- A private API running in your VPC/VNet
+- Cloudflare Tunnel configured and running
+- Workers account with Workers VPC access
+
+## 1. Create the VPC Service
+
+First, create a service for your internal API:
+
+```bash
+npx wrangler vpc service create api-service \
+  --type http \
+  --tunnel-id <YOUR_TUNNEL_ID> \
+  --hostname internal-api.company.local \
+  --resolver-ips 10.0.0.1 \
+  --http-port 8080
+```
+
+Note the service ID returned for the next step.
+
+## 2. Configure your Worker
+
+Update your `wrangler.toml`:
+
+```toml
+name = "private-api-gateway"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+[[services]]
+binding = "INTERNAL_API"
+service_id = "<YOUR_SERVICE_ID>"
+
+[vars]
+API_VERSION = "v2"
+```
+
+## 3. Implement the Worker
+
+Create `src/index.js`:
+
+```javascript
+export default {
+	async fetch(request, env, ctx) {
+		// Parse the incoming request
+		const url = new URL(request.url);
+
+		// Add authentication for internal API
+		const headers = new Headers(request.headers);
+		headers.set("X-Internal-Auth", env.INTERNAL_API_KEY);
+		headers.set("X-Request-ID", crypto.randomUUID());
+
+		// Transform the path to internal API format
+		const internalPath = `/api/${env.API_VERSION}${url.pathname}`;
+
+		try {
+			// Forward request to internal API
+			const response = await env.INTERNAL_API.fetch(
+				`http://internal-api.company.local:8080${internalPath}${url.search}`,
+				{
+					method: request.method,
+					headers: headers,
+					body: request.body,
+				},
+			);
+
+			// Add CORS headers for browser requests
+			const responseHeaders = new Headers(response.headers);
+			responseHeaders.set("Access-Control-Allow-Origin", "*");
+			responseHeaders.set(
+				"Access-Control-Allow-Methods",
+				"GET, POST, PUT, DELETE, OPTIONS",
+			);
+
+			// Return the response
+			return new Response(response.body, {
+				status: response.status,
+				statusText: response.statusText,
+				headers: responseHeaders,
+			});
+		} catch (error) {
+			// Log error for debugging
+			console.error("Failed to reach internal API:", error);
+
+			// Return user-friendly error
+			return new Response(
+				JSON.stringify({
+					error: "Service temporarily unavailable",
+					timestamp: new Date().toISOString(),
+				}),
+				{
+					status: 503,
+					headers: {
+						"Content-Type": "application/json",
+						"Retry-After": "30",
+					},
+				},
+			);
+		}
+	},
+};
+```
+
+## 4. Add authentication middleware
+
+For more complex authentication, create a middleware pattern:
+
+```javascript
+// middleware/auth.js
+export async function authenticate(request, env) {
+	const authHeader = request.headers.get("Authorization");
+
+	if (!authHeader || !authHeader.startsWith("Bearer ")) {
+		return new Response("Unauthorized", { status: 401 });
+	}
+
+	const token = authHeader.substring(7);
+
+	// Validate token (example using KV store)
+	const user = await env.AUTH_TOKENS.get(token);
+
+	if (!user) {
+		return new Response("Invalid token", { status: 401 });
+	}
+
+	return JSON.parse(user);
+}
+
+// src/index.js
+import { authenticate } from "./middleware/auth.js";
+
+export default {
+	async fetch(request, env, ctx) {
+		// Authenticate request
+		const authResult = await authenticate(request, env);
+
+		if (authResult instanceof Response) {
+			return authResult; // Return error response
+		}
+
+		const user = authResult;
+
+		// Add user context to internal request
+		const headers = new Headers(request.headers);
+		headers.set("X-User-ID", user.id);
+		headers.set("X-User-Role", user.role);
+
+		// Continue with API request...
+		const response = await env.INTERNAL_API.fetch(request.url, {
+			method: request.method,
+			headers: headers,
+			body: request.body,
+		});
+
+		return response;
+	},
+};
+```
+
+## 5. Deploy and test
+
+Deploy your Worker:
+
+```bash
+npx wrangler deploy
+```
+
+Test the API gateway:
+
+```bash
+# Test GET request
+curl https://private-api-gateway.workers.dev/users \
+  -H "Authorization: Bearer your-token"
+
+# Test POST request
+curl -X POST https://private-api-gateway.workers.dev/users \
+  -H "Authorization: Bearer your-token" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "John Doe", "email": "john@example.com"}'
+```
+
+## Next steps
+
+- Add [authentication and authorization](/workers/examples/auth-with-headers/)
+- Implement [rate limiting](/workers/runtime-apis/durable-objects/)
+- Set up [monitoring and alerting](/analytics/analytics-engine/)
+- Explore [other examples](/workers-vpc/examples/)

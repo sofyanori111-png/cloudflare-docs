@@ -1,0 +1,47 @@
+---
+title: Route to private services from Workers
+pcx_content_type: tutorial
+---
+
+This example shows how to route requests to internal microservices from Workers.
+
+## Overview
+
+Use Workers VPC to create a centralized gateway that:
+- Routes requests based on URL paths
+- Provides authentication and rate limiting
+- Load balances across internal services
+
+## Code example
+
+```javascript
+export interface Env {
+  USER_SERVICE: PrivateNetworkService;
+  ORDER_SERVICE: PrivateNetworkService;
+  INVENTORY_SERVICE: PrivateNetworkService;
+}
+
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
+    const url = new URL(request.url);
+    
+    // Add authentication
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response('Unauthorized', { status: 401 });
+    }
+
+    // Route to internal services
+    if (url.pathname.startsWith('/api/users')) {
+      return env.USER_SERVICE.fetch(request);
+    } else if (url.pathname.startsWith('/api/orders')) {
+      return env.ORDER_SERVICE.fetch(request);
+    } else if (url.pathname.startsWith('/api/inventory')) {
+      return env.INVENTORY_SERVICE.fetch(request);
+    }
+    
+    return new Response('Not Found', { status: 404 });
+  }
+};
+```
+

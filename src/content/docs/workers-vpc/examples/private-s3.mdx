@@ -1,0 +1,252 @@
+---
+title: Access private S3 bucket
+pcx_content_type: example
+---
+
+import { Tabs, TabItem } from "~/components";
+
+:::note
+This example shows how to access an S3 bucket through a VPC endpoint without exposing it to the public internet.
+:::
+
+## Overview
+
+Learn how to:
+
+- Set up VPC endpoint for S3 in AWS
+- Create a VPC Service for S3 access
+- Create a Worker to interact with S3
+- Handle S3 authentication with AWS Signature V4
+
+## Prerequisites
+
+- AWS account with S3 bucket in a VPC
+- VPC endpoint for S3 configured
+- Cloudflare Tunnel running in your VPC
+- AWS credentials for S3 access
+
+## 1. Configure AWS VPC endpoint for S3
+
+First, create a VPC endpoint for S3 in your AWS VPC:
+
+```bash
+# Create VPC endpoint for S3
+aws ec2 create-vpc-endpoint \
+  --vpc-id vpc-xxxxx \
+  --service-name com.amazonaws.region.s3 \
+  --route-table-ids rtb-xxxxx
+
+# Update S3 bucket policy to allow VPC endpoint access
+aws s3api put-bucket-policy --bucket my-private-bucket \
+  --policy '{
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Principal": "*",
+        "Action": "s3:*",
+        "Resource": [
+          "arn:aws:s3:::my-private-bucket/*",
+          "arn:aws:s3:::my-private-bucket"
+        ],
+        "Condition": {
+          "StringEquals": {
+            "aws:SourceVpce": "vpce-xxxxx"
+          }
+        }
+      }
+    ]
+  }'
+```
+
+## 2. Create VPC Service
+
+```bash
+npx wrangler vpc service create s3-service \
+  --type http \
+  --tunnel-id <YOUR_TUNNEL_ID> \
+  --hostname s3.amazonaws.com \
+  --resolver-ips 10.0.0.1 \
+  --https-port 443
+```
+
+The VPC Service configuration handles the routing to S3 through your tunnel. The service will automatically route requests to `s3.amazonaws.com` through the specified tunnel, eliminating the need for manual tunnel ingress configuration.
+
+## 3. Configure your Worker
+
+Update `wrangler.toml`:
+
+```toml
+name = "private-s3-worker"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+[[services]]
+binding = "PRIVATE_S3"
+service_id = "<YOUR_SERVICE_ID>"
+
+[vars]
+AWS_REGION = "us-east-1"
+S3_BUCKET = "my-private-bucket"
+```
+
+## 4. Implement S3 access with AWS Signature V4
+
+Create `src/index.js`:
+
+```javascript
+import { AwsClient } from "aws4fetch";
+
+export default {
+	async fetch(request, env, ctx) {
+		// Initialize AWS client with credentials
+		const aws = new AwsClient({
+			accessKeyId: env.AWS_ACCESS_KEY_ID,
+			secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
+			region: env.AWS_REGION,
+			service: "s3",
+		});
+
+		const url = new URL(request.url);
+		const path = url.pathname.slice(1); // Remove leading slash
+
+		try {
+			switch (request.method) {
+				case "GET":
+					return await getObject(aws, env, path);
+				case "PUT":
+					return await putObject(aws, env, path, request);
+				case "DELETE":
+					return await deleteObject(aws, env, path);
+				case "HEAD":
+					return await headObject(aws, env, path);
+				default:
+					return new Response("Method not allowed", { status: 405 });
+			}
+		} catch (error) {
+			console.error("S3 operation failed:", error);
+			return new Response("Internal server error", { status: 500 });
+		}
+	},
+};
+
+async function getObject(aws, env, key) {
+	const s3Url = `https://${env.S3_BUCKET}.s3.${env.AWS_REGION}.amazonaws.com/${key}`;
+
+	// Sign the request
+	const signedRequest = await aws.sign(s3Url, {
+		method: "GET",
+	});
+
+	// Make request through VPC Service
+	const response = await env.PRIVATE_S3.fetch(signedRequest);
+
+	if (!response.ok) {
+		return new Response(`S3 error: ${response.statusText}`, {
+			status: response.status,
+		});
+	}
+
+	// Return the object with appropriate headers
+	return new Response(response.body, {
+		headers: {
+			"Content-Type":
+				response.headers.get("Content-Type") || "application/octet-stream",
+			"Content-Length": response.headers.get("Content-Length"),
+			ETag: response.headers.get("ETag"),
+			"Last-Modified": response.headers.get("Last-Modified"),
+			"Cache-Control": "public, max-age=3600",
+		},
+	});
+}
+
+async function putObject(aws, env, key, request) {
+	const body = await request.arrayBuffer();
+	const s3Url = `https://${env.S3_BUCKET}.s3.${env.AWS_REGION}.amazonaws.com/${key}`;
+
+	// Sign the request with body
+	const signedRequest = await aws.sign(s3Url, {
+		method: "PUT",
+		headers: {
+			"Content-Type":
+				request.headers.get("Content-Type") || "application/octet-stream",
+			"Content-Length": body.byteLength.toString(),
+		},
+		body: body,
+	});
+
+	// Upload through VPC Service
+	const response = await env.PRIVATE_S3.fetch(signedRequest);
+
+	if (!response.ok) {
+		return new Response(`Failed to upload: ${response.statusText}`, {
+			status: response.status,
+		});
+	}
+
+	return new Response(
+		JSON.stringify({
+			message: "Object uploaded successfully",
+			key: key,
+			etag: response.headers.get("ETag"),
+		}),
+		{
+			status: 201,
+			headers: { "Content-Type": "application/json" },
+		},
+	);
+}
+
+async function deleteObject(aws, env, key) {
+	const s3Url = `https://${env.S3_BUCKET}.s3.${env.AWS_REGION}.amazonaws.com/${key}`;
+
+	const signedRequest = await aws.sign(s3Url, {
+		method: "DELETE",
+	});
+
+	const response = await env.PRIVATE_S3.fetch(signedRequest);
+
+	if (!response.ok && response.status !== 404) {
+		return new Response(`Failed to delete: ${response.statusText}`, {
+			status: response.status,
+		});
+	}
+
+	return new Response(
+		JSON.stringify({
+			message: "Object deleted successfully",
+			key: key,
+		}),
+		{
+			headers: { "Content-Type": "application/json" },
+		},
+	);
+}
+
+async function headObject(aws, env, key) {
+	const s3Url = `https://${env.S3_BUCKET}.s3.${env.AWS_REGION}.amazonaws.com/${key}`;
+
+	const signedRequest = await aws.sign(s3Url, {
+		method: "HEAD",
+	});
+
+	const response = await env.PRIVATE_S3.fetch(signedRequest);
+
+	return new Response(null, {
+		status: response.status,
+		headers: {
+			"Content-Type": response.headers.get("Content-Type"),
+			"Content-Length": response.headers.get("Content-Length"),
+			ETag: response.headers.get("ETag"),
+			"Last-Modified": response.headers.get("Last-Modified"),
+		},
+	});
+}
+```
+
+## Next steps
+
+- Implement [S3-compatible object storage](/r2/api/s3/)
+- Add [image transformation](/images/)
+- Set up [access logging](/logs/)
+- Explore [R2 as an alternative](/r2/)

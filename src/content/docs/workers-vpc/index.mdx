@@ -7,10 +7,16 @@ head:
   - tag: title
     content: Overview
 description: Securely connect your private cloud to Cloudflare to build cross-cloud apps.
-
 ---
 
-import { CardGrid, Description, Feature, LinkTitleCard, Plan, RelatedProduct, Render, LinkButton, Flex } from "~/components"
+import {
+	Description,
+	Plan,
+	Render,
+	TabItem,
+	Tabs,
+	RelatedProduct,
+} from "~/components";
 
 <Description>
 
@@ -20,25 +26,72 @@ Securely connect your private cloud to Cloudflare to build cross-cloud apps.
 
 <Plan type="workers-all" />
 
-Most services and APIs in external clouds (for example, your private cloud) are not accessible from the public Internet. This can pose a challenge if you are trying to access these resources when developing on Cloudflare's developer platform.
+Workers VPC allows you to connect your Workers to your private APIs and services in external clouds (AWS, Azure, GCP, on-premise, etc.) that are not accessible from the public Internet.
 
-Workers VPC offers private network services, which allows you to establish a private connection from your private network to Cloudflare by creating a tunnel in a private network. This enables you to access services like APIs and databases in your private cloud from your Cloudflare network.
+With Workers VPC, you can configure a [Cloudflare Tunnel](/cloudflare-one/connections/connect-networks/) to establish secure, private connections from your private networks to Cloudflare. Then, you can configure a [VPC Service](/workers-vpc/configuration/vpc-services/) for each service in the external private network you need to connect to, and using [VPC Service bindings](/workers-vpc/api/) to connect from Workers.
 
-<div>
-  <LinkButton href="/workers-vpc/get-started/">Get started</LinkButton>
-</div>
+:::note
 
-***
+Workers VPC is currently in beta. Features and APIs may change before general availability. During the beta, Workers VPC is available for free to all Workers plans.
 
-## Features
+:::
 
-<Feature header="Private network services" href="/workers-vpc/features/private-network-services/">
+<Tabs>
+	<TabItem label="index.ts">
+```ts
+export default {
+	async fetch(request, env, ctx) {
+		// Access your private API through the service binding
+		const response = await env.PRIVATE_API.fetch(
+			"http://internal-api.company.local/data",
+		);
 
-Securely connect services in your private cloud to your Cloudflare network.
+    	// Process the response from your private network
+    	const data = await response.json();
 
-</Feature>
+    	return new Response(JSON.stringify(data), {
+    		headers: { "content-type": "application/json" },
+    	});
+    },
 
-***
+};
+
+````
+
+    </TabItem>
+    <TabItem label="wrangler.jsonc">
+```json
+	{
+		"$schema": "node_modules/wrangler/config-schema.json",
+		"name": "WORKER-NAME",
+		"main": "src/index.ts",
+		"compatibility_date": "2025-02-04",
+		"vpc_services": [
+			{
+				"binding": "VPC_SERVICE",
+				"service_id": "ENTER_SERVICE_ID",
+				"remote": true
+			}
+		]
+	}
+````
+
+</TabItem>
+</Tabs>
+
+## Use cases
+
+### Applications on Workers with access to private APIs
+
+Deploy APIs or full-stack applications to Workers that connect to private authentication services, CMS systems, internals APIs and more. Your Workers applications run globally with optimized access to the backend services of your private network.
+
+### API gateway
+
+Route requests to internal microservices in your private network based on URL paths. Centralize access control and load balancing for multiple private services.
+
+### Internal tooling, agents, dashboards
+
+Build employee-facing applications and MCP servers that aggregate data from multiple private services. Create unified dashboards, admin panels, and internal tools without exposing backend systems.
 
 ## Related products
 
@@ -48,5 +101,8 @@ Build serverless applications and deploy instantly across the globe for exceptio
 
 </RelatedProduct>
 
-***
+<RelatedProduct header="Hyperdrive" href="/hyperdrive/" product="hyperdrive">
 
+Connect to PostgreSQL and MySQL databases from Workers with connection pooling and caching built-in, available to all Workers plans.
+
+</RelatedProduct>
