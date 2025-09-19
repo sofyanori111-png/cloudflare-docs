@@ -6,7 +6,7 @@ sidebar:
   label: SSH with Access for Infrastructure
 ---
 
-import { Tabs, TabItem, Badge, Render, APIRequest } from "~/components";
+import { Tabs, TabItem, Badge, Render, APIRequest, Steps } from "~/components";
 
 [Access for Infrastructure](/cloudflare-one/applications/non-http/infrastructure-apps/) provides granular control over how users can connect to your SSH servers. This feature uses the same deployment model as [WARP-to-Tunnel](/cloudflare-one/connections/connect-networks/use-cases/ssh/ssh-warp-to-tunnel/) but unlocks more policy options and command logging functionality.
 
@@ -188,3 +188,192 @@ The following SSH features are not supported:
 ### Session duration
 
 SSH sessions have a maximum expected duration of 10 hours. For more information, refer to the [Troubleshooting FAQ](/cloudflare-one/faq/troubleshooting/#long-lived-ssh-sessions-frequently-disconnect).
+
+## Troubleshooting
+
+### `sshd_config` file misconfiguration
+
+Failure to connect to your SSH endpoint could be the result of multiple variables. One reason might be the result of a misconfigured `sshd_config` file.
+
+#### Review your `sshd_config` file for misconfigurations
+
+To rule out any issues in your `sshd_config` file, compare your existing `sshd_config` file with the example below to verify if any directives are causing authentication issues. The following example `sshd_config` file will result in successful authentication:
+
+<details>
+<summary>Example `sshd_config` file</summary>
+
+```
+# This is the sshd server system-wide configuration file.  See
+# sshd_config(5) for more information.
+
+# The strategy used for options in the default sshd_config shipped with
+# OpenSSH is to specify options with their default value where
+# possible, but leave them commented.  Uncommented options override the
+# default value.
+
+PubkeyAuthentication yes
+TrustedUserCAKeys /etc/ssh/ca.pub
+
+Include /etc/ssh/sshd_config.d/*.conf
+
+# When systemd socket activation is used (the default), the socket
+# configuration must be re-generated after changing Port, AddressFamily, or
+# ListenAddress.
+#
+# For changes to take effect, run:
+#
+#   systemctl daemon-reload
+#   systemctl restart ssh.socket
+#
+#Port 22
+#AddressFamily any
+#ListenAddress 0.0.0.0
+#ListenAddress ::
+
+#HostKey /etc/ssh/ssh_host_rsa_key
+#HostKey /etc/ssh/ssh_host_ecdsa_key
+#HostKey /etc/ssh/ssh_host_ed25519_key
+
+# Ciphers and keying
+#RekeyLimit default none
+
+# Logging
+#SyslogFacility AUTH
+LogLevel DEBUG3
+
+# Authentication:
+
+#LoginGraceTime 2m
+PermitRootLogin yes
+#StrictModes yes
+#MaxAuthTries 6
+#MaxSessions 10
+
+
+
+# Expect .ssh/authorized_keys2 to be disregarded by default in future.
+#AuthorizedKeysFile    .ssh/authorized_keys .ssh/authorized_keys2
+
+#AuthorizedPrincipalsFile none
+
+#AuthorizedKeysCommand none
+#AuthorizedKeysCommandUser nobody
+
+# For this to work you will also need host keys in /etc/ssh/ssh_known_hosts
+#HostbasedAuthentication no
+# Change to yes if you don't trust ~/.ssh/known_hosts for
+# HostbasedAuthentication
+#IgnoreUserKnownHosts no
+# Don't read the user's ~/.rhosts and ~/.shosts files
+#IgnoreRhosts yes
+
+# To disable tunneled clear text passwords, change to no here!
+#PasswordAuthentication yes
+#PermitEmptyPasswords no
+
+# Change to yes to enable challenge-response passwords (beware issues with
+# some PAM modules and threads)
+KbdInteractiveAuthentication no
+
+# Kerberos options
+#KerberosAuthentication no
+#KerberosOrLocalPasswd yes
+#KerberosTicketCleanup yes
+#KerberosGetAFSToken no
+
+# GSSAPI options
+#GSSAPIAuthentication no
+#GSSAPICleanupCredentials yes
+#GSSAPIStrictAcceptorCheck yes
+#GSSAPIKeyExchange no
+
+# Set this to 'yes' to enable PAM authentication, account processing,
+# and session processing. If this is enabled, PAM authentication will
+# be allowed through the KbdInteractiveAuthentication and
+# PasswordAuthentication.  Depending on your PAM configuration,
+# PAM authentication via KbdInteractiveAuthentication may bypass
+# the setting of "PermitRootLogin yes
+# If you just want the PAM account and session checks to run without
+# PAM authentication, then enable this but set PasswordAuthentication
+# and KbdInteractiveAuthentication to 'no'.
+UsePAM yes
+
+#AllowAgentForwarding yes
+#AllowTcpForwarding yes
+#GatewayPorts no
+X11Forwarding yes
+#X11DisplayOffset 10
+#X11UseLocalhost yes
+#PermitTTY yes
+PrintMotd no
+#PrintLastLog yes
+#TCPKeepAlive yes
+#PermitUserEnvironment no
+#Compression delayed
+#ClientAliveInterval 0
+#ClientAliveCountMax 3
+#UseDNS no
+#PidFile /run/sshd.pid
+#MaxStartups 10:30:100
+#PermitTunnel no
+#ChrootDirectory none
+#VersionAddendum none
+
+# no default banner path
+#Banner none
+
+# Allow client to pass locale environment variables
+AcceptEnv LANG LC_*
+
+# override default of no subsystems
+Subsystem    sftp    /usr/lib/openssh/sftp-server
+
+# Example of overriding settings on a per-user basis
+#Match User anoncvs
+#    X11Forwarding no
+#    AllowTcpForwarding no
+#    PermitTTY no
+#    ForceCommand cvs server
+```
+
+</details>
+
+#### Replace and test with example configuration
+
+The next steps will walk you through a troubleshooting regimen. You will temporarily replace your existing `sshd_config` file with the provided example to rule out configuration issues. Before proceeding, carefully [review and compare both files](#review-your-sshd_config-file-for-misconfigurations) to identify any conflicting directives.
+
+:::caution[You may be lose access to your SSH server]
+
+These troubleshooting steps could result in you being locked out of your SSH server because your existing auth may rely on existing configuration that is not in the [example file](#review-your-sshd_config-file-for-misconfigurations). Proceed with utmost caution.
+
+:::
+
+1. Back up the existing `sshd_config` file.
+
+	```
+	mv /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+	```
+
+2. Create a new `sshd_config` file.
+
+	```
+	vi /etc/ssh/sshd_config
+	```
+
+3. Enter insert mode by pressing the 'i' character on your keyboard.
+
+4. Paste in the [example file](#review-your-sshd_config-file-for-misconfigurations).
+
+5. Exit insert mode by pressing the escape `esc` key.
+6. Enter `:x` to save and exit.
+7. [Reload](#reload-your-ssh-server) your SSH server.
+
+	:::caution[You may lose access to your SSH server]
+	Restarting your `sshd` service will result in the termination of your current SSH connection. Make sure your reload instead restarting to avoid losing access to your SSH server permanently.
+	:::
+
+	<Render file="ssh/restart-server" product="cloudflare-one" />
+
+
+
+
