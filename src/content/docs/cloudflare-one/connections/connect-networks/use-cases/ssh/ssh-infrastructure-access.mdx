@@ -6,7 +6,7 @@ sidebar:
   label: SSH with Access for Infrastructure
 ---
 
-import { Tabs, TabItem, Badge, Render, APIRequest, Steps } from "~/components";
+import { Tabs, TabItem, Badge, Render, APIRequest } from "~/components";
 
 [Access for Infrastructure](/cloudflare-one/applications/non-http/infrastructure-apps/) provides granular control over how users can connect to your SSH servers. This feature uses the same deployment model as [WARP-to-Tunnel](/cloudflare-one/connections/connect-networks/use-cases/ssh/ssh-warp-to-tunnel/) but unlocks more policy options and command logging functionality.
 
@@ -342,7 +342,7 @@ Subsystem    sftp    /usr/lib/openssh/sftp-server
 
 The next steps will walk you through a troubleshooting regimen. You will temporarily replace your existing `sshd_config` file with the provided example to rule out configuration issues. Before proceeding, carefully [review and compare both files](#review-your-sshd_config-file-for-misconfigurations) to identify any conflicting directives.
 
-:::caution[You may be lose access to your SSH server]
+:::caution[You may lose access to your SSH server]
 
 These troubleshooting steps could result in you being locked out of your SSH server because your existing auth may rely on existing configuration that is not in the [example file](#review-your-sshd_config-file-for-misconfigurations). Proceed with utmost caution.
 
@@ -374,6 +374,4 @@ These troubleshooting steps could result in you being locked out of your SSH ser
 
 	<Render file="ssh/restart-server" product="cloudflare-one" />
 
-
-
-
+// Need a conclusion. What does this do? What if it still doesn't work?
