@@ -44,9 +44,9 @@ curl https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/addressing/prefix
 -H "X-Auth-Email: $CLOUDFLARE_EMAIL" \
 -H "X-Auth-Key: $CLOUDFLARE_API_KEY" \
 -X POST \
--d '{"cidr": "162.159.211.0/24",
+-d '{"cidr": "203.0.113.0/24",
       "asn": 13335,
-      "ownership_validation" : { "delegate_loa_creation": true }
+      "delegate_loa_creation": true
     }
 ```
 
@@ -80,10 +80,10 @@ curl https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/addressing/prefix
 <Tabs> <TabItem label="Modify IRR record">
 
 1. Copy the `ownership_validation_token` returned by the API call.
-2. On the IRR record of the prefix you are onboarding, add the following string in either a `description` or `remarks` field. Replace `<TOKEN>` by the actual token you copied in the previous step.
+2. On the IRR record of the prefix you are onboarding, add the following string in either a `description` or `remarks` field. Replace `<OWNERSHIP_VALIDATION_TOKEN>` by the actual token you copied in the previous step.
 
 ```
-cf-validation: <TOKEN>
+cf-validation: <OWNERSHIP_VALIDATION_TOKEN>
 ```
 
 :::note
@@ -119,7 +119,7 @@ Once the ownership validation is successful, and if the RPKI and IRR validations
 
    (WIP - Add response example (collapsable))
 
-(WIP - Add code block example)
+(WIP - Add code block example for "/accounts/account_id/addressing/prefixes/prefix_id/validate")
 
 4. (Optional) You can allow other accounts to use part or all of your BYOIP prefix. Refer to [Prefix delegations](/byoip/concepts/prefix-delegations/) for details.
 
