@@ -1,35 +1,17 @@
 ---
-title: Workers VPC Private Network Services (Beta)
+title: Workers VPC Services (Beta)
 description: Access private resources in your VPC from Cloudflare Workers
 date: 2025-09-25T01:00:00Z
 ---
 
-We're excited to announce the beta release of **Workers VPC Private Network Services**, enabling Cloudflare Workers to securely access resources in your private networks across AWS, Azure, GCP, and on-premise infrastructure.
+We're excited to announce the beta release of **Workers VPC Services**, enabling Cloudflare Workers to securely access resources in your private networks.
 
 ## What's new
 
-- **Private Network Services**: Create secure connections to internal APIs, databases, and services that aren't exposed to the public internet
+- **VPC Services**: Create secure connections to internal APIs, databases, and services through Cloudflare Tunnel
 - **Service Bindings**: Access private resources using familiar Worker binding syntax
-- **Multi-cloud Support**: Connect to resources across major cloud providers with platform-specific setup guides
-- **Cloudflare Tunnel Integration**: Leverage existing tunnel infrastructure for secure, outbound-only connections
+- **Multi-cloud Support**: Connect to resources across AWS, Azure, GCP, and on-premise infrastructure
 
 ## Getting started
 
-1. Set up a Cloudflare Tunnel in your private network
-2. Create a Private Network Service using Wrangler
-3. Add the service binding to your Worker configuration
-4. Access your private resources securely from Workers
-
-[Read the documentation](/workers-vpc/) to learn more and get started.
-
-## Beta limitations
-
-During the beta period:
-- Only HTTP/HTTPS protocols are supported (TCP support coming soon)
-- Maximum 100 Private Network Services per account
-- Maximum 10 service bindings per Worker
-- Available on paid Workers plans only
-
-## Feedback
-
-We'd love to hear your feedback on Workers VPC. Please share your experience and feature requests in the [Cloudflare Community](https://community.cloudflare.com/).
+Set up a Cloudflare Tunnel, create a VPC Service, add service bindings to your Worker, and access private resources securely. [Read the documentation](/workers-vpc/) to get started.
