@@ -17,71 +17,34 @@ The tunnel maintains persistent connections to Cloudflare, eliminating the need 
 This section provides tunnel configuration specific to Workers VPC use cases. For comprehensive tunnel documentation including monitoring and advanced configurations, refer to the [full Cloudflare Tunnel documentation](/cloudflare-one/connections/connect-networks/).
 :::
 
-## Quick setup
+## Create and run tunnel (`cloudflared`)
 
-### Install cloudflared
+Cloudflare Tunnel requires the installation of a lightweight and highly scalable server-side daemon, `cloudflared`, to connect your infrastructure to Cloudflare.
 
-<Tabs>
-<TabItem label="Linux">
+Cloudflare Tunnels can be created one of two ways:
 
-```sh
-curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared
-chmod +x cloudflared
-sudo mv cloudflared /usr/local/bin/
-```
+1. **Remotely-managed tunnels (recommended):** Remotely-managed configurations are stored on Cloudflare, allowing you to manage the tunnel from any machine using the dashboard, API, or Terraform.
+2. **Locally-managed tunnels:** A locally-managed tunnel is created by running `cloudflared tunnel create <NAME>` on the command line. Tunnel configuration is stored in your local cloudflared directory.
 
-</TabItem>
-<TabItem label="macOS">
+For Workers VPC, we recommend creating a remotely-managed tunnel through the dashboard. Follow the [Tunnels for Workers VPC dashboard setup guide](/workers-vpc/get-started/) to create your tunnel with provided installation commands shown in the dashboard.
 
-```sh
-brew install cloudflared
-```
+For locally-managed tunnels, refer to the [`cloudflared` locally-managed tunnels](/cloudflare-one/connections/connect-networks/do-more-with-tunnels/local-management/) guide.
+For manual installation, refer to the [`cloudflared` downloads page](/cloudflare-one/connections/connect-networks/downloads/) for platform-specific installation instructions.
 
-</TabItem>
-<TabItem label="Windows">
+:::note[Important Note]
+Cloudflare Tunnels can either be configured for usage with [Cloudflare Zero Trust](/cloudflare-one/) or [Workers VPC](/workers-vpc/).
 
-```powershell
-choco install cloudflared
-```
+Use Tunnels with Zero Trust when you are exposing internal applications securely to your employees with Cloudflare Access and hostnames.
 
-</TabItem>
-<TabItem label="Docker">
+Use Tunnels with Workers VPC when you want to access private APIs, private databases, internal services or other HTTP services within your cloud or on-premise private network from Workers.
 
-```sh
-docker pull cloudflare/cloudflared:latest
-```
+:::
 
-</TabItem>
-</Tabs>
+:::note
 
-### Create and run tunnel
+[Ingress configurations](/cloudflare-one/connections/connect-networks/do-more-with-tunnels/local-management/configuration-file/) for locally-managed tunnels are specific to Zero Trust are not required for Workers VPC as routing is handled by the VPC Service configuration.
 
-Authenticate with Cloudflare, create your tunnel, and run it with a basic configuration that routes all traffic to your local services:
-
-```sh
-cloudflared tunnel login
-cloudflared tunnel create workers-vpc-tunnel
-```
-
-Create `~/.cloudflared/config.yml` with your tunnel configuration:
-
-```yaml
-tunnel: <YOUR_TUNNEL_ID>
-credentials-file: /home/user/.cloudflared/<YOUR_TUNNEL_ID>.json
-
-ingress:
-  - hostname: "*"
-    service: http://localhost:8080
-    originRequest:
-      noTLSVerify: true
-  - service: http_status:404
-```
-
-Start the tunnel:
-
-```sh
-cloudflared tunnel run workers-vpc-tunnel
-```
+:::
 
 ## Cloud platform setup guides
 
