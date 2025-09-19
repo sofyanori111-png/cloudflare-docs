@@ -19,7 +19,7 @@ To set up Cloudflare Organizations, refer to [Create an Organization](/fundament
 
 ## Account types
 
-The Gateway Tenant platform supports tiered and siloed account configurations.
+Tiered policies support tiered and siloed account configurations.
 
 ### Tiered accounts
 
@@ -70,30 +70,3 @@ flowchart TD
 :::caution[Limitations]
 Tiered policies do not support egress policies, device posture selectors, private apps, or virtual networks.
 :::
-
-### Siloed accounts
-
-In a siloed account configuration, each account operates independently within the same tenant. Organization owners manage each account's own security policies, resources, and configurations separately.
-
-```mermaid
-flowchart TD
-%% Accessibility
- accTitle: How Gateway policies work in a siloed account configuration
- accDescr: Flowchart describing the order of precedence Gateway applies policies in a siloed account configuration.
-
-%% Flowchart
- subgraph s1["Siloed account A"]
-        n1["Block social media"]
-  end
- subgraph s2["Siloed account C"]
-        n2["Block instant messaging"]
-  end
- subgraph s3["Siloed account B"]
-        n3["Block news"]
-  end
-    A["Organization owner"] -- Administers --> s1 & s3 & s2
-
-    n1@{ shape: lean-l}
-    n2@{ shape: lean-l}
-    n3@{ shape: lean-l}
-```
