@@ -138,10 +138,10 @@ Although you can delegate IPs to other accounts, the IP address service bindings
 
 ## 2. Create a default service binding
 
-When you onboard your IP prefixes to Cloudflare, there must be one service binding that spans across your entire prefix. Traffic destined for a given IP address will be routed to this service by default, unless you create an override binding.
+When you onboard your IP prefixes to Cloudflare, there must be one service binding that spans across your entire prefix. Traffic destined for a given IP address will be routed to this service by default. You can also configure [additional service bindings](#optional-additional-bindings) as described in the next step.
 
 :::note
-Magic Transit can only be used as default binding, spanning across your entire prefix. You can then override the Magic Transit binding with CDN or Spectrum for smaller subnets but not the other way around. For details refer to [scope](/byoip/service-bindings/#scope).
+Magic Transit can only be used as default binding, spanning across your entire prefix. You can then add CDN or Spectrum bindings for smaller subnets but not the other way around. For details refer to [service bindings scope](/byoip/service-bindings/#scope).
 :::
 
 1. Make a `POST` request to the [Create service binding](/api/resources/addressing/subresources/prefixes/subresources/service_bindings/methods/create/) endpoint, indicating the entire BYOIP prefix that you are onboarding and the service that should be used for your default binding.
@@ -161,9 +161,9 @@ A corresponding BGP prefix will be created automatically. Allow five hours befor
 For Magic Transit customers, the BGP prefix will be created in a `locked` state. Work with your account team to make sure it is unlocked after additional checks have passed.
 :::
 
-### (Optional) Add override bindings
+### (Optional) Additional bindings
 
-If you want to selectively route traffic on a per-IP address basis to CDN or Spectrum, you can create additional service bindings that will override the default one.
+If you want to selectively route traffic on a per-IP address basis to CDN or Spectrum, you can create additional service bindings.
 
 :::note
 The steps below only cover assigning specific IPs to additional services. For guidance that includes CDN or Spectrum setup steps, refer to [Service bindings](https://developers.cloudflare.com/byoip/service-bindings/).
