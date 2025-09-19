@@ -30,7 +30,9 @@ The Gateway Tenant platform supports tiered and siloed account configurations.
 In a tiered account configuration, a top-level parent account enforces global security policies that apply to all of its child accounts. Child accounts can override or add policies as needed while still being managed by the parent account. MSPs can also configure child accounts independently from the parent account, including:
 
 - Configuring a [custom block page](/cloudflare-one/policies/gateway/block-page/)
+  - Child accounts will use the block page setting used by the parent account unless you configure separate block settings for the child account. This applies to both [redirects](/cloudflare-one/policies/gateway/block-page/#redirect-to-a-block-page) and [custom block pages](/cloudflare-one/policies/gateway/block-page/#customize-the-block-page). The block page uses the account certificate for each child account.
 - Generating or uploading [root certificates](/cloudflare-one/connections/connect-devices/user-side-certificates/)
+  - If Gateway cannot attribute an incoming DNS query to a child account, it will use the parent account's certificate. This happens when the source IP address of the DNS query does not match a child account or if a custom DNS resolver endpoint is not configured.
 - Mapping [DNS locations](/cloudflare-one/connections/connect-devices/agentless/dns/locations/)
 - Creating [lists](/cloudflare-one/policies/gateway/lists/)
 
