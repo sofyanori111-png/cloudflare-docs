@@ -15,16 +15,10 @@ You can export the following types of telemetry data:
 
 - **Traces** - Traces showing request flows through your Worker and connected services
 - **Logs** - Application logs including `console.log()` output and system-generated logs  
-- **Metrics** - Performance metrics and custom measurements (not yet supported - coming soon)
+- **Metrics** - Performance metrics and custom measurements (**not yet supported**)
 
 ### Supported destinations
-
-Cloudflare Workers can export data to any platform that supports the OpenTelemetry Protocol (OTLP), including:
-- Datadog
-- Honeycomb 
-- Grafana Cloud
-- Sentry 
-- Custom OTLP endpoints
+Cloudflare Workers can export data to any platform that supports proper OpenTelemetry Protocol (OTLP) endpoints (e.g. `https://api.honeycomb.io/v1/traces`)
 
 ## Setting up OpenTelemetry-compatible destinations
 
@@ -37,7 +31,7 @@ Before you can export telemetry data, you need to create and configure a destina
    - **Destination Name** - A descriptive name (e.g., "Datadog APM", "Honeycomb Logs")
    - **Destination Type** - Choose between "Traces" or "Logs"
    - **OTLP Endpoint** - The URL where your observability platform accepts OTLP data. This endpoint should end in `/logs` or /traces`
-   - **Custom Headers** (Optional) - Add any authentication headers or other required headers
+   - **Custom Headers** (Optional) - Any authentication headers or other required headers
 
 ## Enabling OpenTelemetry export for your Worker
 
@@ -60,10 +54,4 @@ After setting up destinations in the dashboard, configure your Worker to export 
   }
 }
 ```
-Then redeploy your Worker for new configurations to take effect. 
-
-### Configuration options
-- **`enabled`** - Enable or disable telemetry collection
-- **`head_sample_rate`** - Percentage of requests to sample (0.0 to 1.0)
-- **`destinations`** - Array of destination names to export data to. These should be from the destination names created in the dashboard. Include `"cloudflare"` in this array to also send traces and logs to the Workers Dashboard. 
-
+Then redeploy your Worker for new configurations to take effect. It may take a few minutes for events to reach your destination. 

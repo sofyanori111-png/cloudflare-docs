@@ -7,13 +7,12 @@ sidebar:
     hideIndex: false
 ---
 
-import { Badge, DirectoryListing } from "~/components";
+## What is Workers tracing? 
 
 Tracing gives you end-to-end visibility into the life of a request as it travels through your Workers application and connected services, helping you to identify performance bottlenecks, debug issues, and understand complex request flows. 
 
 With tracing you can answer questions such as:
 * What is the cause of a long-running request?
-* Where in the chain of services did a request fail?
 * How long do subrequests to my Worker take?
 * How long are my requests to my KV Namespace or R2 bucket taking? 
 
@@ -21,52 +20,52 @@ With tracing you can answer questions such as:
 
 Each trace consists of one or more spans, representing the various calls made to different Worker services as part of the invocation. Cloudflare has automatically instrumented fetch calls and requests to Cloudflare resources (e.g. Workers KV, D1 Databases, Durable Objects) bound to your Workers application, without requiring you to install and configure an OpenTelemetry SDK. 
 
-Take for example, application that handles online ordering and makes request to a D1 Database to fetch customer information, an external API to validate payment information, and a Cloudflare Queue to submit the order. 
+Take for example, an application that handles online ordering and makes request to a D1 Database to fetch customer information, an external API to validate payment information, and a Cloudflare Queue to submit the order. Tracing lets you visualize an invocation call by call at each part of the request journey. Our example above may look something like this: 
 
-Tracing lets you visualize an invocation call by call at each part of the request journey. Our example above may look something like this: 
+**TODO: insert example of trace here**
 
-TODO: insert example of trace here
+While our work for automatic instrumentation is ongoing, we've [documented](/workers/observability/traces/spans-and-attributes) all existing spans and attributes currently instrumented today. 
 
 ## How to enable tracing
 
-If you would like to view traces in the Cloudflare Dashboard using Workers Observability, you can set the following in your Wrangler configuration file:
+To view traces in the Workers dashboard, you can set the following in your Wrangler configuration file: 
 
 ```jsonc title="wrangler.jsonc"
 
-{
-  "observability": {
-    // enabling traces
-    "traces": {
-      "enabled": true,
-    },
-  }
+"observability": {
+  // enabling traces
+  "traces": {
+    "enabled": true
+  },
 }
+
+```
+Or simply include the following to persist logs **and** traces to the Workers dashboard: 
+
+```jsonc title="wrangler.jsonc"
+
+"observability": {
+  "enabled": true
+}
+
 ```
 
-You can also export OpenTelemetry traces to a 3rd party destination such as Datadog or Honeycomb. 
-
 ### Exporting OpenTelemetry traces to a 3rd party destination
-
-In addition to viewing traces in the Cloudflare Dashboard, you can export traces to any OpenTelemetry-compatible destination, including popular platforms such as Datadog and Honeycomb. 
-
-To configure trace export to external destinations, you'll need to set up a destination in the Cloudflare dashboard and set your desired destination within your Wrangler configuration. 
-
+You can also export [OpenTelemetry](https://opentelemetry.io/) (OTel) traces to a 3rd party destination such as Honeycomb by  [setting up an external destination](/src/content/docs/workers/observability/exporting-opentelemetry-data/index.mdx) in the Cloudflare dashboard and setting that destination in your Wrangler configuration file. Learn more [here](/src/content/docs/workers/observability/exporting-opentelemetry-data/index.mdx).
 
 ## Head-based sampling
+Head-based sampling allows you to trace a percentage of incoming requests in your Cloudflare Worker. With sampling, you can help reduce volume and manage costs, while still providing meaningful insights into your application.  You can configure head-based sampling for both tracing and logging separately on a per-Worker basis. 
 
-Head-based sampling allows you to trace a percentage of incoming requests in your Cloudflare Worker. Most production applications at scale use head sampling because it is unnecessary and costly to trace every single request. With sampling, you can help reduce volume and manage costs, while still providing meaningful insights into your application.  
+The valid range is from 0 to 1, where 0 indicates zero out of one hundred invocations will be traced, and 1 indicates every requests will be traced. If `head_sampling_rate` is unspecified, it defaults to tracing 100% of requests. 
 
-You can configure head-based sampling for both tracing and logging separately on a per-Worker basis. The valid range is from 0 to 1, where 0 indicates zero out of one hundred invocations will be traced, and 1 indicates every requests will be traced. If head_sampling_rate is unspecified, it defaults to tracing 100% of requests. 
-
-You can configure this in your Wrangler configuration like this: 
+You can configure `head_sampling_rate` in your Wrangler configuration. If you have logs enabled with a `head_sampling_rate`, you can create a separate `head_sampling_rate` for traces. 
 
 ```jsonc title="wrangler.jsonc"
 
-{
+"observability":{
     "tracing": {
       
         "enabled": true
-        "destinations": ["datadog"]
         // set tracing sampling rate to 5%
         "head_sample_rate": 0.05
     },
@@ -85,16 +84,14 @@ Workers tracing is currently **free** during the early beta period. This include
 
 Starting on xx/xx/xxxx, tracing will be billed as part of Workers observability. Each span in a trace counts as one observability event, sharing the same monthly quota and pricing as [Workers logs](https://developers.cloudflare.com/workers/platform/pricing/#workers-logs):
 
-|                  | Events (trace spans or log events)                                                      | Retention |
+|                  | Events (trace spans or log events)                                                    | Retention |
 | ---------------- | ------------------------------------------------------------------------- | --------- |
 | **Workers Free** | 100,000 per day                                                          | 3 Days    |
 | **Workers Paid** | 10 million included per month <br /> +$0.05 per additional 100,000 events | 30 Days   |
 
-When billing begins on xx/xx/xxxx, you'll automatically start being charged based on your plan. 
+On xx/xx/xxxx, you will start being billed for your tracing usage. 
 
+## Known issues
+- Trace context propagation 
+- Custom spans and attributes
 
-## [Spans and attributes](/workers/observability/traces/spans-and-attributes)
-While our work for automatic instrumentation is ongoing, we've documented all existing spans and attributes currently instrumented today. 
-
-
-<DirectoryListing />
