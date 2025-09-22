@@ -15,7 +15,6 @@ You can export the following types of telemetry data:
 
 - **Traces** - Traces showing request flows through your Worker and connected services
 - **Logs** - Application logs including `console.log()` output and system-generated logs  
-- **Metrics** - Performance metrics and custom measurements (**not yet supported**)
 
 ### Supported destinations
 Cloudflare Workers can export data to any platform that supports proper OpenTelemetry Protocol (OTLP) endpoints (e.g. `https://api.honeycomb.io/v1/traces`)
@@ -26,8 +25,9 @@ Before you can export telemetry data, you need to create and configure a destina
 
 ### Creating a destination
 
-1. Head to your account's Workers Observability section of the dashboard and add a new destination. 
-2. **Configure your destination:**
+1. Head to your account's [Workers Observability](https://dash.cloudflare.com/?to=/:account/workers-and-pages/observability/destinations) section of the dashboard 
+2. Click add destination. 
+3. Configure your destination:
    - **Destination Name** - A descriptive name (e.g., "Datadog APM", "Honeycomb Logs")
    - **Destination Type** - Choose between "Traces" or "Logs"
    - **OTLP Endpoint** - The URL where your observability platform accepts OTLP data. This endpoint should end in `/logs` or /traces`
@@ -35,21 +35,19 @@ Before you can export telemetry data, you need to create and configure a destina
 
 ## Enabling OpenTelemetry export for your Worker
 
-After setting up destinations in the dashboard, configure your Worker to export telemetry data by updating your `wrangler.jsonc` configuration.
+After setting up destinations in the dashboard, configure your Worker to export telemetry data by updating your `wrangler.jsonc` configuration. Your destination name configurated in your configuration file should be the same as the destination configured in the dashboard. 
 
 ```jsonc title="wrangler.jsonc"
 {
   "observability": {
     "traces": {
       "enabled": true,
-      "destinations": ["honeycomb-apm", "datadog-apm"],
-      "head_sample_rate": 0.05
+      "destinations": ["tracing-destination-name"],
     },
      
     "logs": {
       "enabled": true,
-      "destinations": ["datadog-logs", "honeycomb-logs"],
-      "head_sample_rate": 0.5
+      "destinations": ["logs-destination-name"]
     }
   }
 }

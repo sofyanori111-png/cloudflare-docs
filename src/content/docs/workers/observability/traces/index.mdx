@@ -36,16 +36,7 @@ To view traces in the Workers dashboard, you can set the following in your Wrang
   // enabling traces
   "traces": {
     "enabled": true
-  },
-}
-
-```
-Or simply include the following to persist logs **and** traces to the Workers dashboard: 
-
-```jsonc title="wrangler.jsonc"
-
-"observability": {
-  "enabled": true
+  }
 }
 
 ```
@@ -67,13 +58,13 @@ You can configure `head_sampling_rate` in your Wrangler configuration. If you ha
       
         "enabled": true
         // set tracing sampling rate to 5%
-        "head_sample_rate": 0.05
+        "head_sampling_rate": 0.05
     },
 
     "logging": {
         "enabled": true
         // set logging sampling rate to 50%
-        "head_sample_rate": 0.5
+        "head_sampling_rate": 0.5
     }
 }
 ```
