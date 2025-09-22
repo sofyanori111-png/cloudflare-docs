@@ -3,11 +3,9 @@ title: Access private S3 bucket
 pcx_content_type: example
 ---
 
-import { Tabs, TabItem } from "~/components";
+import { Tabs, TabItem, WranglerConfig } from "~/components";
 
-:::note
 This example shows how to access an S3 bucket through a VPC endpoint without exposing it to the public internet.
-:::
 
 ## Overview
 
@@ -76,6 +74,7 @@ The VPC Service configuration handles the routing to S3 through your tunnel. The
 
 Update `wrangler.toml`:
 
+<WranglerConfig>
 ```toml
 name = "private-s3-worker"
 main = "src/index.js"
@@ -89,12 +88,13 @@ service_id = "<YOUR_SERVICE_ID>"
 AWS_REGION = "us-east-1"
 S3_BUCKET = "my-private-bucket"
 ```
+</WranglerConfig>
 
 ## 4. Implement S3 access with AWS Signature V4
 
 Create `src/index.js`:
 
-```javascript
+```js title="index.js"
 import { AwsClient } from "aws4fetch";
 
 export default {

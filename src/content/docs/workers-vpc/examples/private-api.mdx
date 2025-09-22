@@ -3,11 +3,9 @@ title: Access private API
 pcx_content_type: example
 ---
 
-import { Tabs, TabItem } from "~/components";
+import { Tabs, TabItem, WranglerConfig } from "~/components";
 
-:::note
-This example demonstrates how to access a private REST API that's not exposed to the public internet.
-:::
+This example demonstrates how to access a private REST API that is not exposed to the public internet.
 
 ## Overview
 
@@ -42,6 +40,7 @@ Note the service ID returned for the next step.
 
 Update your `wrangler.toml`:
 
+<WranglerConfig>
 ```toml
 name = "private-api-gateway"
 main = "src/index.js"
@@ -54,12 +53,13 @@ service_id = "<YOUR_SERVICE_ID>"
 [vars]
 API_VERSION = "v2"
 ```
+</WranglerConfig>
 
 ## 3. Implement the Worker
 
 Create `src/index.js`:
 
-```javascript
+```js title="index.js"
 export default {
 	async fetch(request, env, ctx) {
 		// Parse the incoming request
@@ -125,7 +125,7 @@ export default {
 
 For more complex authentication, create a middleware pattern:
 
-```javascript
+```js
 // middleware/auth.js
 export async function authenticate(request, env) {
 	const authHeader = request.headers.get("Authorization");

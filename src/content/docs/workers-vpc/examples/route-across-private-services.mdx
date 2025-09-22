@@ -14,7 +14,7 @@ Use Workers VPC to create a centralized gateway that:
 
 ## Code example
 
-```javascript
+```js
 export interface Env {
   USER_SERVICE: PrivateNetworkService;
   ORDER_SERVICE: PrivateNetworkService;
@@ -24,7 +24,7 @@ export interface Env {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
-    
+
     // Add authentication
     const authHeader = request.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {
@@ -39,7 +39,7 @@ export default {
     } else if (url.pathname.startsWith('/api/inventory')) {
       return env.INVENTORY_SERVICE.fetch(request);
     }
-    
+
     return new Response('Not Found', { status: 404 });
   }
 };

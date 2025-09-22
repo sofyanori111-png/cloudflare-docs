@@ -29,6 +29,7 @@ Cloudflare Tunnels can be created one of two ways:
 For Workers VPC, we recommend creating a remotely-managed tunnel through the dashboard. Follow the [Tunnels for Workers VPC dashboard setup guide](/workers-vpc/get-started/) to create your tunnel with provided installation commands shown in the dashboard.
 
 For locally-managed tunnels, refer to the [`cloudflared` locally-managed tunnels](/cloudflare-one/connections/connect-networks/do-more-with-tunnels/local-management/) guide.
+
 For manual installation, refer to the [`cloudflared` downloads page](/cloudflare-one/connections/connect-networks/downloads/) for platform-specific installation instructions.
 
 :::note[Important Note]
@@ -42,7 +43,7 @@ Use Tunnels with Workers VPC when you want to access private APIs, private datab
 
 :::note
 
-[Ingress configurations](/cloudflare-one/connections/connect-networks/do-more-with-tunnels/local-management/configuration-file/) for locally-managed tunnels are specific to Zero Trust are not required for Workers VPC as routing is handled by the VPC Service configuration.
+[Ingress configurations](/cloudflare-one/connections/connect-networks/do-more-with-tunnels/local-management/configuration-file/) for locally-managed tunnels are specific to Zero Trust, and are not required for Workers VPC, as routing is handled by the VPC Service configuration.
 
 :::
 

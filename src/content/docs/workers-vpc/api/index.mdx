@@ -13,7 +13,7 @@ Each request made on the binding will route to the specific service that was con
 
 :::note
 
-Workers VPC is currently in beta. Features and APIs may change before general availability. During the beta, Workers VPC is available for free to all Workers plans.
+Workers VPC is currently in beta. Features and APIs may change before general availability. While in beta, Workers VPC is available for free to all Workers plans.
 
 :::
 
@@ -25,7 +25,7 @@ A VPC Service binding is accessed via the `env` parameter in your Worker's fetch
 
 Makes an HTTP request to the private service through the configured tunnel.
 
-```javascript
+```js
 const response = await env.VPC_SERVICE_BINDING.fetch(url, options);
 ```
 
@@ -50,7 +50,7 @@ Returns a `Promise<Response>` that resolves to a standard Fetch API Response obj
 
 #### Basic GET request
 
-```javascript
+```js
 export default {
 	async fetch(request, env) {
 		const privateRequest = new Request(
@@ -68,7 +68,7 @@ export default {
 
 #### POST request with body
 
-```javascript
+```js
 export default {
 	async fetch(request, env) {
 		const privateRequest = new Request(
@@ -102,7 +102,7 @@ export default {
 
 #### Request with HTTPS and IP address
 
-```javascript
+```js
 export default {
 	async fetch(request, env) {
 		const privateRequest = new Request("https://10.0.1.50:8443/api/data");
@@ -116,4 +116,4 @@ export default {
 ## Next steps
 
 - Configure [service bindings in wrangler.toml](/workers-vpc/configuration/vpc-services/)
-- View [usage examples](/workers-vpc/examples/)
+- Refer to [usage examples](/workers-vpc/examples/)

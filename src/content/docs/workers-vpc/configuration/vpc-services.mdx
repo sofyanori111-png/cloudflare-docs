@@ -22,20 +22,20 @@ VPC Services enforce that requests are routed to their intended service without 
 
 :::note
 
-Workers VPC is currently in beta. Features and APIs may change before general availability. During the beta, Workers VPC is available for free to all Workers plans.
+Workers VPC is currently in beta. Features and APIs may change before general availability. While in beta, Workers VPC is available for free to all Workers plans.
 
 :::
 
-## VPC Service Configuration
+## VPC Service configuration
 
 A VPC Service consists of:
 
 - **Type**: Currently only `http` is supported (support for `tcp` coming soon)
 - **Tunnel ID**: The Cloudflare Tunnel that provides network connectivity
-- **Hostname or IPv4/IPv6 addresses**: The hostname, or IPv4 and/or IPv6 addresses to use to route to your service from the tunnel in your private network.
+- **Hostname or IPv4/IPv6 addresses**: The hostname, or IPv4 and/or IPv6 addresses to use to route to your service from the tunnel in your private network
 - **Ports**: HTTP and/or HTTPS port configuration (optional, defaults to 80/443)
 
-## Configuration Example
+## Configuration example
 
 The following is an example of a VPC Service for a service using custom HTTP and HTTPS ports, and both IPv4 and IPv6 addresses.
 
@@ -83,7 +83,7 @@ The following is an example of a VPC Service for a service using custom HTTP and
 
 ## Workers binding configuration
 
-Once you've created a VPC Service, you can bind it to your Worker:
+Once you have created a VPC Service, you can bind it to your Worker:
 
 <WranglerConfig>
 ```toml
@@ -95,22 +95,7 @@ binding = "PRIVATE_API"
 service_id = "5634563546"
 remote = true
 
-````
-
-```jsonc
-{
-  "name": "my-worker",
-  "main": "src/index.js",
-  "services": [
-    {
-      "binding": "PRIVATE_API",
-      "service_id": "5634563546",
-      "remote": true
-    }
-  ]
-}
-````
-
+```
 </WranglerConfig>
 
 You can have multiple service bindings:
@@ -132,29 +117,7 @@ binding = "INTERNAL_CACHE"
 service_id = "3412345678"
 remote = true
 
-````
-
-```jsonc
-{
-  "services": [
-    {
-      "binding": "PRIVATE_API",
-      "service_id": "5634563546",
-      "remote": true
-    },
-    {
-      "binding": "PRIVATE_DATABASE",
-      "service_id": "7856789012",
-      "remote": true
-    },
-    {
-      "binding": "INTERNAL_CACHE",
-      "service_id": "3412345678",
-      "remote": true
-    }
-  ]
-}
-````
+```
 
 </WranglerConfig>
 
@@ -162,4 +125,4 @@ remote = true
 
 - Set up [Cloudflare Tunnel](/workers-vpc/configuration/tunnel/) for your environment
 - Learn about the [Service Binding API](/workers-vpc/api/)
-- View [examples](/workers-vpc/examples/) of common use cases
+- Refer to [examples](/workers-vpc/examples/) of common use cases
