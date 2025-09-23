@@ -30,5 +30,7 @@ Available to all DNS Firewall customers as part of their existing subscription.
 
 ## Where to Find It
 
-- Go to [**Analytics > DNS Firewall**](https://dash.cloudflare.com/?to=/:account/dns-firewall/analytics) in the Cloudflare Dashboard.  
+- In the Cloudflare dashboard, go to the **DNS Firewall** page. 
+
+ <DashButton url="/?to=/:account/dns-firewall" /> 
 - [Read more to learn about DNS Firewall Analytics](https://developers.cloudflare.com/dns/dns-firewall/analytics/)
