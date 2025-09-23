@@ -33,4 +33,4 @@ Available to all DNS Firewall customers as part of their existing subscription.
 - In the Cloudflare dashboard, go to the **DNS Firewall** page. 
 
  <DashButton url="/?to=/:account/dns-firewall" /> 
-- [Read more to learn about DNS Firewall Analytics](https://developers.cloudflare.com/dns/dns-firewall/analytics/)
+- Refer to the [DNS Firewall Analytics](/dns/dns-firewall/analytics/) to learn more.
