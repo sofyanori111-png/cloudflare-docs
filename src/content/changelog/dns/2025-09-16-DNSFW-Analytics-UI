@@ -15,7 +15,7 @@ Access [GraphQL-powered DNS Firewall analytics](/dns/dns-firewall/analytics/) di
 
 - **Query summary**: Describes trends over time, segmented by dimensions.  
 - **Query statistics**: Describes totals, cached/uncached queries, and processing/response times.  
-- **DNS queries by data center** — Global view plus top 10 data centers.  
+- **DNS queries by data center**: Describes global view and the top 10 data centers.  
 - **Top query statistics** — Breakdowns by key dimensions, with search and expand options (up to top 100 items).  
 
 Additional features:  
