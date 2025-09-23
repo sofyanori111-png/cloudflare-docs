@@ -5,7 +5,7 @@ sidebar:
   order: 2
 ---
 
-import { APIRequest, Tabs, TabItem, GlossaryDefinition } from "~/components";
+import { APIRequest, Tabs, TabItem, GlossaryDefinition, Details } from "~/components";
 
 Work with your account team to make sure your contract covers everything you need to onboard your prefix. Cloudflare requires service-specific configurations, as well as some requirements common to all BYOIP customers.
 
@@ -124,9 +124,10 @@ Once the ownership validation is successful, you can remove the token.
 When all validations pass - RPKI, IRR, and ownership - the `approved` field in your prefix will return `"V"`. This means you can proceed to create IP address service bindings[^1].
 
 If needed, you can use the [Prefix Details endpoint](/api/resources/addressing/subresources/prefixes/methods/get/) to check if any issues were found during validation. If so, proceed with the necessary changes and make a request to restart validation.
+
 <APIRequest path= "/accounts/{account_id}/addressing/prefixes/{prefix_id}" method="GET" />
 
-   (WIP - Add response example (collapsable))
+(WIP - Add response example (collapsable))
 
 (WIP - Add code block example for "/accounts/account_id/addressing/prefixes/prefix_id/validate")
 
@@ -192,11 +193,38 @@ The steps below only cover assigning specific IPs to additional services. For gu
 
 1. Plan for what IP(s) will get the additional binding. Cloudflare **strongly** recommends implementing service bindings through an **aggregated** CIDR block, as it is more efficient than adding discrete bindings for non-contiguous CIDR blocks.
 
-   (WIP - Add collapsable example similar to existing ones in the service bindings docs)
+<Details header="Example">
+
+**Magic Transit protected prefix:** `203.0.113.0/24`
+
+**IPs to upgrade to CDN:**
+
+`203.0.113.16`<br />
+`203.0.113.17`<br />
+`203.0.113.18`<br />
+`203.0.113.19`<br />
+`203.0.113.20`<br />
+`203.0.113.21`<br />
+`203.0.113.22`<br />
+`203.0.113.23`
+
+Add one discrete CDN service binding for `203.0.113.16` with a `/29` netmask.
+
+</Details>
 
 2. Make a `POST` request to the [Create service binding](/api/resources/addressing/subresources/prefixes/subresources/service_bindings/methods/create/) endpoint, indicating the IP address you want to bind to the CDN or Spectrum. Specify the **corresponding network mask** as needed.
 
-<APIRequest path="/accounts/{account_id}/addressing/prefixes/{prefix_id}/bindings" method="POST"json={{ "cidr": "203.0.113.100/32", "service_id": "<SERVICE_ID>"}} code={{mark: [6, 7]}}/>
+<APIRequest
+  path="/accounts/{account_id}/addressing/prefixes/{prefix_id}/bindings"
+	method="POST"
+	json={{
+		"cidr": "203.0.113.16/29",
+		"service_id": "<SERVICE_ID>"
+	}}
+	code={{
+		mark: [6, 7]
+	}}
+/>
 
 In the response body, the initial provisioning state should be `provisioning`.
 
@@ -208,7 +236,7 @@ In the response body, the initial provisioning state should be `provisioning`.
      "messages": [],
      "success": true,
      "result": {
-       "cidr": "203.0.113.100/32",
+       "cidr": "203.0.113.16/29",
        "id": "<SERVICE_BINDING_ID>",
        "provisioning": {
          "state": "provisioning"
