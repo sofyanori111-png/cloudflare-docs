@@ -14,7 +14,12 @@ import YAML from "yaml";
 const files = await glob("dist/**/*.html");
 
 for (const file of files) {
-	if (file === "dist/index.html" || file === "dist/404.html") {
+	if (
+		file === "dist/index.html" ||
+		file === "dist/404.html" ||
+		file === "dist/llms.txt" ||
+		file.includes("llms-full.txt")
+	) {
 		continue;
 	}
 
