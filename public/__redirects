@@ -2299,7 +2299,8 @@
 /fundamentals/speed/amp-real-ulr/* /speed/optimization/other/amp-real-ulr/:splat 301
 /fundamentals/speed/rocket-loader/* /speed/optimization/content/rocket-loader/:splat 301
 /fundamentals/speed/signed-exchanges/* /speed/optimization/other/signed-exchanges/:splat 301
-/fundamentals/speed/speed-test/* /speed/speed-test/:splat 301
+/fundamentals/speed/speed-test/* /speed/observatory/:splat 301
+/speed/speed-test/* /speed/observatory/:splat 301
 /http-applications/* /version-management/:splat 301
 /http3/* https://www.cloudflare.com/learning/performance/what-is-http3/ 301
 /railgun/* / 301
@@ -2421,4 +2422,9 @@
 /ai-gateway/guardrails/* /ai-gateway/features/guardrails/:splat 301
 /ai-gateway/websockets-api/* /ai-gateway/usage/websockets-api/:splat 301
 
-
+# Containers
+/containers/image-management /containers/platform-details/image-management 301
+/containers/scaling-and-routing /containers/platform-details/scaling-and-routing 301
+/containers/architecture /containers/platform-details/architecture 301
+/containers/durable-object-methods /containers/platform-details/durable-object-methods 301
+/containers/platform-details /containers/platform-details/architecture 301
