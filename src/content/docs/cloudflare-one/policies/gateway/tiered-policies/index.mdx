@@ -11,6 +11,8 @@ Only available on Enterprise plans. For more information, contact your account t
 
 Gateway supports using [Cloudflare Organizations](/fundamentals/organizations/) to share configurations between and apply specific policies to accounts within an organization. Tiered Gateway policies with Organizations support [DNS](/cloudflare-one/policies/gateway/dns-policies/), [network](/cloudflare-one/policies/gateway/network-policies/), [HTTP](/cloudflare-one/policies/gateway/http-policies/), and [resolver](/cloudflare-one/policies/gateway/resolver-policies/) policies.
 
+Managed service providers (MSPs) that are Cloudflare Partners can use tiered or siloed Gateway accounts with the Tenant API. For more information, refer to [Managed service providers (MSPs)](/cloudflare-one/policies/gateway/tiered-policies/managed-service-providers/).
+
 ## Get started
 
 To set up Cloudflare Organizations, refer to [Create an Organization](/fundamentals/organizations/#create-an-organization). Once you have provisioned and configured your organization's accounts, you can create [Gateway policies](/cloudflare-one/policies/gateway/).
@@ -19,7 +21,7 @@ To set up Cloudflare Organizations, refer to [Create an Organization](/fundament
 
 Accounts in organizations include source accounts and recipient accounts.
 
-In a tiered account configuration, a top-level source account enforces global security policies that apply to all of its recipient accounts. Recipient accounts can add policies as needed while still being managed by the source account. Organization owners can also configure recipient accounts independently from the source account, including:
+In a tiered policy configuration, a top-level source account can share Gateway policies with its recipient accounts. Recipient accounts can add policies as needed while still being managed by the source account. Organization owners can also configure other settings for recipient accounts independently from the source account, including:
 
 - Configuring a [custom block page](/cloudflare-one/policies/gateway/block-page/)
 - Generating or uploading [root certificates](/cloudflare-one/connections/connect-devices/user-side-certificates/)
@@ -28,35 +30,50 @@ In a tiered account configuration, a top-level source account enforces global se
 
 Gateway will automatically [generate a unique root CA](/cloudflare-one/connections/connect-devices/user-side-certificates/#generate-a-cloudflare-root-certificate) for each recipient account in an organization. Each recipient account is subject to the default Zero Trust [account limits](/cloudflare-one/account-limits/).
 
-Gateway evaluates source account policies before any recipient account policies. In a Cloudflare Organization, recipient accounts cannot bypass source account policies. All traffic and corresponding policies, logs, and configurations for a recipient account will be contained to that recipient account. Organization owners can view logs for recipient accounts on a per-account basis, and [Logpush jobs](/logs/logpush/) must be configured separately.
+Gateway evaluates source account policies before any recipient account policies. In a Cloudflare Organization, recipient accounts cannot bypass or modify source account policies. All traffic and corresponding policies, logs, and configurations for a recipient account will be contained to that recipient account. Organization owners can view logs for recipient accounts on a per-account basis, and [Logpush jobs](/logs/logpush/) must be configured separately.
 
 ```mermaid
 flowchart TD
 %% Accessibility
  accTitle: How Gateway policies work in a tiered account configuration
- accDescr: Flowchart describing the order of precedence Gateway applies policies in a tiered account configuration.
+ accDescr: Flowchart describing the order of precedence Gateway applies policies in a tiered account configuration using Cloudflare Organizations.
 
 %% Flowchart
  subgraph s1["Source account"]
         n1["Block malware"]
-        n2["Block DNS tunnel"]
-        n3["Block spyware"]
+        n2["Block spyware"]
+        n3["Block DNS tunnel"]
   end
  subgraph s2["Recipient account A"]
+        n5["Block malware"]
+        n6["Block spyware"]
         n4["Block social media"]
   end
  subgraph s3["Recipient account B"]
-        n5["Block instant messaging"]
+        n8["Block malware"]
+        n9["Block spyware"]
+        n10["Block DNS tunnel"]
+        n7["Block instant messaging"]
   end
     n1 ~~~ n2
     n2 ~~~ n3
-    s1 -- "Applies policies to" --> s2 & s3
+    s1 -- Share policies with --> s2 & s3
 
-    n1@{ shape: lean-l}
-    n2@{ shape: lean-l}
-    n3@{ shape: lean-l}
-    n4@{ shape: lean-l}
-    n5@{ shape: lean-l}
+    n1@{ shape: rect}
+    n2@{ shape: rect}
+    n3@{ shape: rect}
+    n4@{ shape: rect}
+    n5@{ shape: rect}
+     n1:::Sky
+     n2:::Sky
+     n3:::Peach
+     n5:::Sky
+     n6:::Sky
+     n8:::Sky
+     n9:::Sky
+     n10:::Peach
+    classDef Sky stroke-width:1px, stroke-dasharray:none, stroke:#374D7C, fill:#E2EBFF, color:#374D7C
+    classDef Peach stroke-width:1px, stroke-dasharray:none, stroke:#FBB35A, fill:#FFEFDB, color:#8F632D
 ```
 
 {/* TODO: Decide best way to surface limitations. Separate section? */}
