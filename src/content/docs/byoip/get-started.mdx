@@ -105,7 +105,19 @@ The exact steps to update your IRR record will depend on the registry you are us
 
 1. Consider the size of the prefix you are bringing to Cloudflare. Since the standard `in-addr.arpa` tree assumes delegations on octet or nibble boundaries, if you onboard prefixes that are not aligned with those, you will have to split up the prefix into subnets and create the corresponding reverse DNS zones for each.
 
-		(WIP - Add calculation examples (collapsable))
+<Details header="Example">
+
+To calculate how many smaller subnets you need, use the following formula:
+
+```
+2^(next boundary - current netmask)
+```
+
+For `1.1.0.0/23`, you would setup two (`2^(24-23)`) reverse DNS zones, one for `1.1.0.0/24` and another for `1.1.1.0/24`.
+
+For 2001:0db8::/34, you would setup four (`2^(36-34)`) reverse DNS zones, for `2001:0db8::/36`, `2001:0db8:1:/36`, `2001:0db8:2::/36`, and `2001:0db8:3::/36`.
+
+</Details>
 
 2. Set up a reverse DNS zone. If you use Cloudflare for DNS, refer to [Reverse DNS zones](/dns/additional-options/reverse-zones/#set-up-a-reverse-zone). If you use a different DNS provider, follow their instructions.
 3. Create TXT records using `cf-validation` as their `name`. They should look like the following example:
