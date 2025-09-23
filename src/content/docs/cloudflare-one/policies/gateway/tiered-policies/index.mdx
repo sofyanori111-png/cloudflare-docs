@@ -13,17 +13,11 @@ Gateway supports using [Cloudflare Organizations](/fundamentals/organizations/) 
 
 ## Get started
 
-{/* Don't need to surface much of the policy creation flow here */}
-
 To set up Cloudflare Organizations, refer to [Create an Organization](/fundamentals/organizations/#create-an-organization). Once you have provisioned and configured your organization's accounts, you can create [Gateway policies](/cloudflare-one/policies/gateway/).
 
 ## Account types
 
-Tiered policies support tiered and siloed account configurations.
-
-### Tiered accounts
-
-{/* TODO: Rename this section and check if siloed accounts are relevant (potentially fix H2 preamble above). Fix the flow to match Orgs config. */}
+Accounts in organizations include source accounts and recipient accounts.
 
 In a tiered account configuration, a top-level source account enforces global security policies that apply to all of its recipient accounts. Recipient accounts can add policies as needed while still being managed by the source account. Organization owners can also configure recipient accounts independently from the source account, including:
 
@@ -70,3 +64,5 @@ flowchart TD
 :::caution[Limitations]
 Tiered policies do not support egress policies, device posture selectors, private apps, or virtual networks.
 :::
+
+## Share policy
