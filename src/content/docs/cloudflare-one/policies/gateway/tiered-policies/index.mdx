@@ -84,7 +84,7 @@ Tiered policies do not support egress policies, device posture selectors, privat
 
 ## Manage policies
 
-You can make changes to your tiered policies in the source account for your Cloudflare Organization.
+You can create, configure, and share your tiered policies in the source account for your Cloudflare Organization.
 
 ### Share policy
 
@@ -92,14 +92,13 @@ To share a Gateway policy from a source account to a recipient account:
 
 1. In [Zero Trust](https://one.dash.cloudflare.com/), go to **Gateway** > **Firewall policies**.
 2. Choose the policy type you want to share. If you want to share a resolver policy, go to **Gateway** > **Resolver policies**.
-3. Find the policy you want to share from the list.
-4. In the three-dot menu, select **Share**.
-5. In **Select account**, choose the accounts you want to share the policy with. To share the policy with all of the recipient accounts in your Organization, choose _Select all accounts in org_.
-6. Select **Continue**, then select **Share**.
+3. Find the policy you want to share from the list. In the three-dot menu, select **Share**. Alternatively, to bulk share multiple policies, you can select each policy you want to share, then select **Actions** > **Share**.
+4. In **Select account**, choose the accounts you want to share the policy with. To share the policy with all existing and future recipient accounts in your Organization, choose _Select all accounts in org_.
+5. Select **Continue**, then select **Share**.
 
 {/* TODO: Find actual time estimate. */}
 
-A sharing icon will appear next to the policy's name. After a few minutes, the policy will appear in the recipient accounts' Gateway policies. Shared policies will appear grayed out in the recipient account's list of Gateway policies.
+A sharing icon will appear next to the policy's name. After a few minutes, the policy will appear in and apply the recipient accounts. Shared policies will appear grayed out in the recipient account's list of Gateway policies.
 
 If a policy fails to share to recipient accounts, Gateway will retry deploying the policy automatically unless the error is unrecoverable.
 
@@ -116,18 +115,67 @@ To change or remove recipients for a Gateway policy:
 
 After a few minutes, the policy sharing will update across the configured recipient accounts.
 
-### Remove policy share
+:::note
+If you selected _Select all accounts in org_ when sharing the policy, you will need to [unshare the policy](#unshare-policy) before you can edit its recipient accounts.
+:::
+
+### Unshare policy
 
 To stop sharing a policy with all recipient accounts:
 
 1. In [Zero Trust](https://one.dash.cloudflare.com/), go to **Gateway** > **Firewall policies**.
 2. Choose the policy type you want to remove. If you want to remove a resolver policy, go to **Gateway** > **Resolver policies**.
-3. Find the policy you want to remove from the list.
-4. In the three-dot menu, select **Unshare**.
-5. Select **Unshare**.
+3. Find the policy you want to remove from the list. In the three-dot menu, select **Unshare**. Alternatively, to bulk remove multiple policies, you can select each policy you want to remove, then select **Actions** > **Unshare**.
+4. Select **Unshare**.
 
 After a few minutes, Gateway will stop sharing the policy with all recipient accounts and only apply the policy to the source account.
 
 ### Edit shared policy
 
 When you edit or delete a shared policy in a source account, Gateway will require confirmation before making any changes. Changes made to shared policies will apply to all recipient accounts. Deleting a shared policy will delete the policy from both the source account and all recipient accounts.
+
+## Manage settings
+
+You can share Zero Trust settings from your source account to recipient accounts in your Cloudflare Organization, including the Gateway block page, extended email address matching, and Access login methods.
+
+{/* TODO: Turn these sections into a flexible partial or tabs. */}
+
+### Share Gateway block page
+
+To share your [Gateway block page](/cloudflare-one/policies/gateway/block-page/) settings from a source account to a recipient account:
+
+1. In [Zero Trust](https://one.dash.cloudflare.com/), go to **Settings** > **Custom pages**.
+2. In **Account Gateway block page**, select the three-dot menu and choose **Share**.
+3. In **Select account**, choose the accounts you want to share the settings with. To share the settings with all existing and future recipient accounts in your Organization, choose _Select all accounts in org_.
+4. Select **Continue**, then select **Share**.
+
+A sharing icon will appear next to the setting. After a few minutes, the setting will appear in and apply to the recipient accounts.
+
+To modify share recipients or unshare the setting, select the three-dot menu and choose **Edit shared configuration recipients** or **Unshare**.
+
+### Share extended email address matching
+
+To share your [extended email address matching](/cloudflare-one/policies/gateway/identity-selectors/#extended-email-addresses) settings from a source account to a recipient account:
+
+1. In [Zero Trust](https://one.dash.cloudflare.com/), go to **Settings** > **Network**.
+2. In **Firewall** > **Matched extended email address**, select the three-dot menu and choose **Share**.
+3. In **Select account**, choose the accounts you want to share the settings with. To share the settings with all existing and future recipient accounts in your Organization, choose _Select all accounts in org_.
+4. Select **Continue**, then select **Share**.
+
+A sharing icon will appear next to the setting. After a few minutes, the setting will appear in and apply to the recipient accounts.
+
+To modify share recipients or unshare the setting, select the three-dot menu and choose **Edit shared configuration recipients** or **Unshare**.
+
+### Share Access login methods
+
+To share your [Access login method](/cloudflare-one/identity/) settings from a source account to a recipient account:
+
+1. In [Zero Trust](https://one.dash.cloudflare.com/), go to **Settings** > **Authentication**.
+2. In **Login methods**, find the identity provider you want to share.
+3. Select the three-dot menu and choose **Share**.
+4. In **Select account**, choose the accounts you want to share the settings with. To share the settings with all existing and future recipient accounts in your Organization, choose _Select all accounts in org_.
+5. Select **Continue**, then select **Share**.
+
+A sharing icon will appear next to the identity provider's name. After a few minutes, the setting will appear in and apply to the recipient accounts.
+
+To modify share recipients or unshare the setting, select the three-dot menu and choose **Edit shared configuration recipients** or **Unshare**.
