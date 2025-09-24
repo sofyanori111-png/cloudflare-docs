@@ -30,7 +30,7 @@ In a tiered policy configuration, a top-level source account can share Gateway p
 
 Gateway will automatically [generate a unique root CA](/cloudflare-one/connections/connect-devices/user-side-certificates/#generate-a-cloudflare-root-certificate) for each recipient account in an Organization. Each recipient account is subject to the default Zero Trust [account limits](/cloudflare-one/account-limits/).
 
-Gateway evaluates source account policies before any recipient account policies. In a Cloudflare Organization, recipient accounts cannot bypass or modify source account policies. All traffic and corresponding policies, logs, and configurations for a recipient account will be contained to that recipient account. Organization owners can view logs for recipient accounts on a per-account basis, and [Logpush jobs](/logs/logpush/) must be configured separately.
+Gateway evaluates source account policies before any recipient account policies. In a Cloudflare Organization, recipient accounts cannot bypass or modify source account policies. All traffic and corresponding policies, logs, and configurations for a recipient account will be contained to that recipient account. Organization owners can view logs for recipient accounts on a per-account basis, and [Logpush jobs](/logs/logpush/) must be configured separately. When using DLP policies with [payload logging](/cloudflare-one/policies/data-loss-prevention/dlp-policies/logging-options/#log-the-payload-of-matched-rules), each recipient account must configure its own [encryption public key](/cloudflare-one/policies/data-loss-prevention/dlp-policies/logging-options/#set-a-dlp-payload-encryption-public-key).
 
 ```mermaid
 flowchart TD
@@ -78,7 +78,7 @@ flowchart TD
 
 ### Limitations
 
-Tiered policies do not support [egress policies](/cloudflare-one/policies/gateway/egress-policies/). You cannot share policies with selectors that target [device posture checks](/cloudflare-one/identity/devices/), [Access private apps](/cloudflare-one/applications/non-http/self-hosted-private-app/), or [virtual networks](/cloudflare-one/connections/connect-networks/private-net/cloudflared/tunnel-virtual-networks/).
+Tiered policies do not support [egress policies](/cloudflare-one/policies/gateway/egress-policies/). Source accounts cannot share policies with selectors that target [device posture checks](/cloudflare-one/identity/devices/), [Access private apps](/cloudflare-one/applications/non-http/self-hosted-private-app/), or [virtual networks](/cloudflare-one/connections/connect-networks/private-net/cloudflared/tunnel-virtual-networks/). Source and recipient accounts can still create and apply policies with these selectors separately from the Organization share.
 
 ## Manage policies
 
@@ -134,7 +134,7 @@ When you edit or delete a shared policy in a source account, Gateway will requir
 
 ## Manage settings
 
-You can share Zero Trust settings from your source account to recipient accounts in your Cloudflare Organization, including the Gateway block page and extended email address matching.
+You can share Zero Trust settings from your source account to recipient accounts in your Cloudflare Organization, including the Gateway block page and extended email address matching. Other Gateway settings configured in a source account, such as [AV scanning](/cloudflare-one/policies/gateway/http-policies/antivirus-scanning/) and [file sandboxing](/cloudflare-one/policies/gateway/http-policies/file-sandboxing/), will not affect recipient account configurations.
 
 {/* TODO: Turn these sections into a flexible partial or tabs. */}
 
