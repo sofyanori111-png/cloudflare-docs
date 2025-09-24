@@ -18,6 +18,12 @@ You do not need to be a Google Cloud Platform user to integrate Google Workspace
 
 ## Set up Google Workspace as an identity provider
 
+:::caution[SCIM Provisioning (Beta)]
+The direct SCIM provisioning integration with Google Workspace is currently in beta and not yet fully functional. Cloudflare is working with Google to complete the final approval process required to enable this feature. While the toggle may be visible in the Zero Trust dashboard, automated user and group provisioning will not work until this enablement process is complete.
+
+While the native integration is pending, a workaround is possible. You can connect to the Google Workspace API, pull user and group data, and then send it to the Cloudflare SCIM endpoint.
+:::
+
 ### 1. Configure Google Workspace
 
 1.  Log in to the Google Cloud Platform [console](https://console.cloud.google.com/). This is separate from your Google Workspace console.
