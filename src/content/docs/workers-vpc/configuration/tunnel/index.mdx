@@ -39,11 +39,13 @@ Use Tunnels with Zero Trust when you are exposing internal applications securely
 
 Use Tunnels with Workers VPC when you want to access private APIs, private databases, internal services or other HTTP services within your cloud or on-premise private network from Workers.
 
+The same `cloudflared` instance can be used to cover both Zero Trust and Workers VPC use cases simultaneously.
+
 :::
 
 :::note
 
-[Ingress configurations](/cloudflare-one/connections/connect-networks/do-more-with-tunnels/local-management/configuration-file/) for locally-managed tunnels are specific to Zero Trust, and are not required for Workers VPC, as routing is handled by the VPC Service configuration.
+[Ingress configurations](/cloudflare-one/connections/connect-networks/do-more-with-tunnels/local-management/configuration-file/) for locally-managed tunnels are only relevant when using tunnels to expose services to the public internet, and are not required for Workers VPC as routing is handled by the VPC Service configuration.
 
 :::
 

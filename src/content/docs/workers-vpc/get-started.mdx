@@ -42,9 +42,17 @@ Additionally, you will need:
 
 Create a new Worker project using Wrangler:
 
-<PackageManagers type="create" pkg="cloudflare@latest" args={"workers-vpc-app"} />
+<PackageManagers
+	type="create"
+	pkg="cloudflare@latest"
+	args={"workers-vpc-app"}
+/>
 
-<Render file="c3-post-run-steps" product="workers" params={{category: "hello-world", type: "Worker only", lang: "TypeScript",}} />
+<Render
+	file="c3-post-run-steps"
+	product="workers"
+	params={{ category: "hello-world", type: "Worker only", lang: "TypeScript" }}
+/>
 
 Navigate to your project directory:
 
@@ -154,7 +162,7 @@ compatibility_date = "2024-01-01"
 binding = "PRIVATE_API"
 service_id = "<YOUR_SERVICE_ID>"
 
-```
+````
 
 </WranglerConfig>
 
@@ -187,7 +195,7 @@ export default {
 	},
 } satisfies ExportedHandler<Env>;
 
-```
+````
 
 ## 6. Test locally
 
@@ -212,7 +220,6 @@ Your Worker is now deployed and can access your private network resources secure
 ## Next steps
 
 - Explore [configuration options](/workers-vpc/configuration/) for advanced setups
-- Set up [high availability tunnels](/workers-vpc/configuration/tunnel/availability/) for production
-- Refer to [platform-specific guides](/workers-vpc/configuration/tunnel/recommended-setups/) for AWS, Azure, GCP, and Kubernetes
-- Refer to [examples](/workers-vpc/examples/) for common use cases
-
+- Set up [high availability tunnels](/workers-vpc/configuration/tunnel/hardware-requirements/) for production
+- View [platform-specific guides](/cloudflare-one/connections/connect-networks/deployment-guides/) for AWS, Azure, GCP, and Kubernetes
+- Check out [examples](/workers-vpc/examples/) for common use cases
