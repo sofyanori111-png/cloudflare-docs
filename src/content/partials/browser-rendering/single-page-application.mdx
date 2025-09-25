@@ -1,0 +1,10 @@
+### Single Page Applications (SPAs)
+
+When scraping a Single Page Application (SPA) with dynamic content, you must ensure the page has fully loaded. To do this, you have two main options:
+
+:::note
+1. Use `waitForSelector` to wait for a specific element to appear on the page. This is often the most reliable and efficient method.
+2. Use `goToOptions` with "networkidle0" or "networkidle2"
+- `"networkidle0"` waits for all network connections to be idle, meaning all resources (including asynchronous JavaScript) have been loaded
+- `"networkidle2"` is a more efficient alternative that waits until there are only two or fewer ongoing network connections
+:::
