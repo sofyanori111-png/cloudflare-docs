@@ -29,8 +29,7 @@ First, create a service for your internal API:
 npx wrangler vpc service create api-service \
   --type http \
   --tunnel-id <YOUR_TUNNEL_ID> \
-  --hostname internal-api.company.local \
-  --resolver-ips 10.0.0.1 \
+  --ipv4 10.0.1.50 \
   --http-port 8080
 ```
 
@@ -76,7 +75,7 @@ export default {
 		try {
 			// Forward request to internal API
 			const response = await env.INTERNAL_API.fetch(
-				`http://internal-api.company.local:8080${internalPath}${url.search}`,
+				`http://10.0.1.50:8080${internalPath}${url.search}`,
 				{
 					method: request.method,
 					headers: headers,
@@ -121,63 +120,7 @@ export default {
 };
 ```
 
-## 4. Add authentication middleware
-
-For more complex authentication, create a middleware pattern:
-
-```js
-// middleware/auth.js
-export async function authenticate(request, env) {
-	const authHeader = request.headers.get("Authorization");
-
-	if (!authHeader || !authHeader.startsWith("Bearer ")) {
-		return new Response("Unauthorized", { status: 401 });
-	}
-
-	const token = authHeader.substring(7);
-
-	// Validate token (example using KV store)
-	const user = await env.AUTH_TOKENS.get(token);
-
-	if (!user) {
-		return new Response("Invalid token", { status: 401 });
-	}
-
-	return JSON.parse(user);
-}
-
-// src/index.js
-import { authenticate } from "./middleware/auth.js";
-
-export default {
-	async fetch(request, env, ctx) {
-		// Authenticate request
-		const authResult = await authenticate(request, env);
-
-		if (authResult instanceof Response) {
-			return authResult; // Return error response
-		}
-
-		const user = authResult;
-
-		// Add user context to internal request
-		const headers = new Headers(request.headers);
-		headers.set("X-User-ID", user.id);
-		headers.set("X-User-Role", user.role);
-
-		// Continue with API request...
-		const response = await env.INTERNAL_API.fetch(request.url, {
-			method: request.method,
-			headers: headers,
-			body: request.body,
-		});
-
-		return response;
-	},
-};
-```
-
-## 5. Deploy and test
+## 4. Deploy and test
 
 Deploy your Worker:
 
