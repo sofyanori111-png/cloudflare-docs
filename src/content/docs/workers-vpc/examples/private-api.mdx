@@ -5,15 +5,7 @@ pcx_content_type: example
 
 import { Tabs, TabItem, WranglerConfig } from "~/components";
 
-This example demonstrates how to access a private REST API that is not exposed to the public internet.
-
-## Overview
-
-This example shows how to:
-
-- Configure a VPC Service for your internal API
-- Create a Worker that acts as a secure gateway
-- Add authentication and request transformation
+This example demonstrates how to access a private REST API that is not exposed to the public internet. In this guide, we will configure a VPC Service for an internal API, create a Worker that makes requests to that API, and deploy the Worker to validate our changes.
 
 ## Prerequisites
 
@@ -51,12 +43,13 @@ service_id = "<YOUR_SERVICE_ID>"
 
 [vars]
 API_VERSION = "v2"
-```
+
+````
 </WranglerConfig>
 
 ## 3. Implement the Worker
 
-Create `src/index.js`:
+In your Workers code, use the VPC Service binding in order to send requests to the service:
 
 ```js title="index.js"
 export default {
@@ -118,17 +111,17 @@ export default {
 		}
 	},
 };
-```
+````
+
+This guide demonstrates how you could create a simple proxy in your Workers. However, you could use VPC Services to fetch APIs directly and manipulate the responses to enable you to build more full-stack and backend functionality on Workers.
 
 ## 4. Deploy and test
 
-Deploy your Worker:
+Now, you can deploy and test your Worker that you have created:
 
 ```bash
 npx wrangler deploy
 ```
-
-Test the API gateway:
 
 ```bash
 # Test GET request
