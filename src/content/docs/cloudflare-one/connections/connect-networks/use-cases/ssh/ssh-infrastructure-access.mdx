@@ -191,7 +191,42 @@ SSH sessions have a maximum expected duration of 10 hours. For more information,
 
 ## Troubleshooting
 
-### `sshd_config` file misconfiguration
+If a user is having difficulty connecting to a target machine, it might be a policy or `sshd_config` file misconfiguration.
+
+## 1. Check target machine connection
+
+A user may be blocked by a policy from reaching an SSH target because:
+
+- An Access policy denies access, or
+- No explicit allow policy exist and Access is set to deny the user by default.
+
+As an end user, run [`warp-cli` target list`](/cloudflare-one/applications/non-http/infrastructure-apps/#display-available-targets) to verify if you have access to the target machine.
+
+- If the target does not appear, the administrator should check the Access logs to confirm whether a policy is blocking access.
+- If the target appears in the list, the issue is likely with the `sshd_config` file.
+
+### 2. Review Access logs
+
+:::note
+
+You will need Cloudflare dashboard access and log view [permissions](/cloudflare-one/roles-permissions/) to proceed with this step.
+
+:::
+
+To review if an Access policy is causing connection issues:
+
+1. Log in to [Zero Trust](https://one.dash.cloudflare.com/).
+2. Go to **Logs** > **Access**.
+3. Select the application you are testing or filter by _Infrastructure_ App Type.
+4. Review the **Decision**. If the **Decision** is not Access granted, select the application and copy the name under App.
+5. Go to **Access** > **Applications**.
+6. Input the app name in the search bar and select the application.
+7. Select **Configure**.
+8. Go to **Policies** to review what criteria may be blocking the user.
+
+By editing a [policy](/cloudflare-one/policies/access/) that is explicitly blocking the user or adding a new policy to explicitly allow the user, the connection issue should be resolved. After saving your policy changes, attempt to connect to the target machine as the end user.
+
+### 3. Debug `sshd_config` file misconfiguration
 
 Failure to connect to your SSH endpoint could be the result of multiple variables. One reason might be the result of a misconfigured `sshd_config` file.
 
