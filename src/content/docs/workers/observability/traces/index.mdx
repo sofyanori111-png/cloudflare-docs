@@ -3,8 +3,7 @@ pcx_content_type: navigation
 title: Traces
 sidebar:
   order: 3
-  group:
-    hideIndex: false
+
 ---
 
 ## What is Workers tracing? 
@@ -16,13 +15,13 @@ With tracing you can answer questions such as:
 * How long do subrequests to my Worker take?
 * How long are my requests to my KV Namespace or R2 bucket taking? 
 
-## Automatic instrumentation 
-
-Each trace consists of one or more spans, representing the various calls made to different Worker services as part of the invocation. Cloudflare has automatically instrumented fetch calls and requests to Cloudflare resources (e.g. Workers KV, D1 Databases, Durable Objects) bound to your Workers application, without requiring you to install and configure an OpenTelemetry SDK. 
-
-Take for example, an application that handles online ordering and makes request to a D1 Database to fetch customer information, an external API to validate payment information, and a Cloudflare Queue to submit the order. Tracing lets you visualize an invocation call by call at each part of the request journey. Our example above may look something like this: 
+Take for example, an application that handles online ordering and makes request to a D1 Database to fetch customer information, an external API to validate payment information, and a Cloudflare Queue to submit the order. Tracing lets you visualize an invocation call by call at each part of the request journey. Our example may look something like this: 
 
 **TODO: insert example of trace here**
+
+## Automatic instrumentation 
+
+Each trace consists of one or more spans, representing the various calls made to different Worker services as part of the invocation. Cloudflare has **automatically** instrumented things like fetch calls and calls to Cloudflare bindings (e.g. Workers KV, D1 Databases, Durable Objects) on your Workers application, without requiring you to install and configure an OpenTelemetry SDK. Just enable on your Worker and you will automatically start emitting traces. 
 
 While our work for automatic instrumentation is ongoing, we've [documented](/workers/observability/traces/spans-and-attributes) all existing spans and attributes currently instrumented today. 
 
@@ -45,7 +44,7 @@ To view traces in the Workers dashboard, you can set the following in your Wrang
 You can also export [OpenTelemetry](https://opentelemetry.io/) (OTel) traces to a 3rd party destination such as Honeycomb by  [setting up an external destination](/workers/observability/exporting-opentelemetry-data) in the Cloudflare dashboard and setting that destination in your Wrangler configuration file. 
 
 ## Head-based sampling
-Head-based sampling allows you to trace a percentage of incoming requests in your Cloudflare Worker. With sampling, you can help reduce volume and manage costs, while still providing meaningful insights into your application.  You can configure head-based sampling for both tracing and logging separately on a per-Worker basis. 
+Head-based sampling allows you to trace a percentage of incoming requests in your Cloudflare Worker. With sampling, you can help reduce volume and manage costs, while still providing meaningful insights into your application.  
 
 The valid range is from 0 to 1, where 0 indicates zero out of one hundred invocations will be traced, and 1 indicates every requests will be traced. If `head_sampling_rate` is unspecified, it defaults to tracing 100% of requests. 
 
@@ -64,7 +63,7 @@ You can configure `head_sampling_rate` in your Wrangler configuration. If you ha
     "logging": {
         "enabled": true
         // set logging sampling rate to 50%
-        "head_sampling_rate": 0.5
+        "head_sampling_rate": 0.6
     }
 }
 ```
@@ -75,14 +74,14 @@ Workers tracing is currently **free** during the early beta period. This include
 
 Starting on xx/xx/xxxx, tracing will be billed as part of Workers observability. Each span in a trace counts as one observability event, sharing the same monthly quota and pricing as [Workers logs](https://developers.cloudflare.com/workers/platform/pricing/#workers-logs):
 
-|                  | Events (trace spans or log events)                                                    | Retention |
+|                  | Events (trace spans or log events)                                        | Retention |
 | ---------------- | ------------------------------------------------------------------------- | --------- |
-| **Workers Free** | 100,000 per day                                                          | 3 Days    |
-| **Workers Paid** | 10 million included per month <br /> +$0.05 per additional 100,000 events | 30 Days   |
+| **Workers Free** | 200,000 per day                                                          | 3 Days    |
+| **Workers Paid** | 10 million included per month +$0.60 per additional million events | 7 Days   |
 
 On xx/xx/xxxx, you will start being billed for your tracing usage. 
 
-## Known issues
-- Trace context propagation 
-- Custom spans and attributes
+Workers tracing is currently in open beta. This page documents current limitations and any features on our roadmap. To provide more feedback and feature requests please [reach out to us](link).
+
+
 
