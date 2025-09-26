@@ -17,6 +17,7 @@ import {
 	WranglerCommand,
 	WranglerNamespace,
 	PackageManagers,
+	DashButton,
 } from "~/components";
 
 Wrangler offers a number of commands to manage your Cloudflare Workers.
@@ -35,6 +36,7 @@ Wrangler offers a number of commands to manage your Cloudflare Workers.
 - [`kv bulk`](#kv-bulk) - Manage multiple key-value pairs within a Workers KV namespace in batches.
 - [`r2 bucket`](#r2-bucket) - Manage Workers R2 buckets.
 - [`r2 object`](#r2-object) - Manage Workers R2 objects.
+- [`r2 sql`](#r2-sql) - Query tables in R2 Data Catalog with R2 SQL.
 - [`secret`](#secret) - Manage the secret variables for a Worker.
 - [`secret bulk`](#secret-bulk) - Manage multiple secret variables for a Worker.
 - [`secrets-store secret`](#secrets-store-secret) - Manage account secrets within a secrets store.
@@ -354,6 +356,11 @@ wrangler delete [<SCRIPT>] [OPTIONS]
 ---
 
 <Render file="wrangler-commands/r2" product="workers" />
+
+---
+## r2 SQL
+
+<Render file="wrangler-commands/r2-sql" product="workers" />
 
 ---
 
@@ -1260,8 +1267,10 @@ wrangler logout
 
 If you are using `CLOUDFLARE_API_TOKEN` instead of OAuth, and you can logout by deleting your API token in the Cloudflare dashboard:
 
-1. Log in to the [Cloudflare dashboard](https://dash.cloudflare.com/).
-2. Go to **My Profile** > **API Tokens**.
+1. In the Cloudflare dashboard, go to the **Account API tokens** page.
+
+   <DashButton url="/?to=/:account/api-tokens" />
+
 3. Select the three-dot menu on your Wrangler token.
 4. Select **Delete**.
 
