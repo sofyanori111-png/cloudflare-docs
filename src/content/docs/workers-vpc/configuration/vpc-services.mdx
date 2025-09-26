@@ -90,7 +90,7 @@ Once you have created a VPC Service, you can bind it to your Worker:
 name = "my-worker"
 main = "src/index.js"
 
-[[services]]
+[[vpc_services]]
 binding = "PRIVATE_API"
 service_id = "5634563546"
 remote = true
@@ -102,17 +102,17 @@ You can have multiple service bindings:
 
 <WranglerConfig>
 ```toml
-[[services]]
+[[vpc_services]]
 binding = "PRIVATE_API"
 service_id = "5634563546"
 remote = true
 
-[[services]]
+[[vpc_services]]
 binding = "PRIVATE_DATABASE"
 service_id = "7856789012"
 remote = true
 
-[[services]]
+[[vpc_services]]
 binding = "INTERNAL_CACHE"
 service_id = "3412345678"
 remote = true
