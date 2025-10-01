@@ -9,19 +9,61 @@ Versioning lets your users upload new code without immediately serving it to pro
 
 You have two ways to control how requests reach a user's Worker version:
 
-1. **Version-specific routing**: Pass a `versionId` to the dispatcher to pick the exact build that handles the request. Use this for previews, tests, or custom logic.
+1. **Version-specific routing**: Pass a `versionId` or `versionAlias` to the dispatcher to pick the exact build that handles the request. Use this for previews, tests, or custom logic.
 2. **Managed deployments**: Let the platform route traffic automatically based on the active deployment. Configure deployments to send all traffic to one version or split it between two versions by percentage.
+
+### Creating a new version
+
+When a user uploads new code to your platform, you'll create a new version of their Worker. This is where you can assign an [alias](/workers/configuration/previews/#create-an-alias) to make it easier to reference later. 
+```bash
+curl -X POST "https://api.cloudflare.com/client/v4/accounts/{account_id}/workers/dispatch/namespaces/{namespace_name}/scripts/{script_name}/versions" \
+  -H "Authorization: Bearer {api_token}" \
+  -H "Content-Type: multipart/form-data" \
+  -F "metadata={\"main_module\":\"worker.js\",\"annotations\":{\"workers/alias\":\"staging\"}}" \
+  -F "files=@worker.js;type=application/javascript+module"
+  ```
+
+he API returns the new version details:
+  ```json
+{
+  "result": {
+    "id": "bcf64294-7b3b-45e1-8f4e-e8e8c1c7cf7c",
+    "number": 5,
+    "metadata": {
+      "created_on": "2024-01-01T00:00:00.000000Z",
+      "modified_on": "2024-01-01T00:00:00.000000Z",
+      "source": "api"
+    },
+    "resources": {
+      "script": {...},
+      "bindings": [...]
+    }
+  }
+}
+```
 
 ### Version-specific routing
 
-Version-specific routing gives you full control over which version handles each request.
+Version-specific routing gives you full control over which version handles each request. The dispatcher returns the requested version regardless of the active deployment, letting you run multiple versions of the same Worker in parallel when needed.
+
+#### Using version aliases (recommended)
+
+In the dispatcher, you can route requests to specific Worker versions by referencing the alias you assigned during version creation:
+
+```js
+const worker = env.DISPATCHER.get("customer-worker", { versionAlias: "staging" });
+return worker.fetch(request);
+```
+Since aliases are predictable (you set them), this is often simpler than tracking version IDs.
+
+#### Using version IDs
+
+You can also route to specific versions by their ID:
 
 ```js
 const worker = env.DISPATCHER.get("customer-worker", { versionId: "abc123" });
 return worker.fetch(request);
 ```
-
-The dispatcher returns the requested version regardless of the active deployment. This lets you run multiple versions of the same Worker in parallel when needed.
 
 ### Managed deployments
 
@@ -62,28 +104,32 @@ Use version-specific routing and deployments together to build features for your
 
 ### Preview environments
 
-Let users test code changes before deploying to production. When they upload new code, you receive the `version_id`. Generate a preview URL that includes this identifier, then route preview traffic to that specific version.
+Let users test code changes before deploying to production. When they upload new code, assign a version alias like `pr-123`. Since you control the alias at creation time, you can use it directly in your routing without needing to store or look up the version ID.
+
+You can serve previews from your platform domain using subdomains that include the version alias, such as `pr-123.customer-name.platform-preview.com`:
 
 ```js
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    const userId = url.hostname.split(".")[0]; // Replace with your own lookup
-
-    const previewVersion = url.searchParams.get("preview");
-
-    if (previewVersion) {
-      // Preview requests target the specified version
-      const worker = env.DISPATCHER.get(userId, { versionId: previewVersion });
+    const subdomain = url.hostname.split(".")[0];
+    
+    // Check if this is a preview subdomain (e.g., staging.customer-name.yourdomain.com)
+    const knownAliases = ["staging", "preview", "dev"];
+    if (knownAliases.includes(subdomain)) {
+      const customerName = url.hostname.split(".")[1]; // Extract customer identifier
+      const worker = env.DISPATCHER.get(customerName, { versionAlias: subdomain });
       return worker.fetch(request);
     }
 
     // Normal requests follow the active deployment
+    const userId = subdomain; // For production: customer-name.yourdomain.com
     const worker = env.DISPATCHER.get(userId);
     return worker.fetch(request);
   }
 };
 ```
+This pattern lets your users access different versions of their Worker through predictable URLs without needing custom DNS configuration on their end.
 
 ### Managing gradual rollouts
 
