@@ -142,6 +142,15 @@ The DNS record (`UUID.cfargotunnel.com`) for each Cloudflare Tunnel can be used 
 
 ### Private load balancer
 
+You can use Cloudflare Private Network Load Balancing to distribute traffic across private endpoints connected via Cloudflare Tunnel. Common use cases include:
+
+* Load balancing internal employee traffic to internal applications
+* Geosteering WARP traffic to internal applications
+* Load balancing internal API calls
+
+To set up load balancing for private IP addresses, refer to the [Private Network Load Balancing documentation](/load-balancing/private-network/tunnels-setup/).
+
+
 If the server IPs overlap, then use a different virtual network in each tunnel so that Load Balancer can route requests to the correct data center and server.
 
 ```mermaid
