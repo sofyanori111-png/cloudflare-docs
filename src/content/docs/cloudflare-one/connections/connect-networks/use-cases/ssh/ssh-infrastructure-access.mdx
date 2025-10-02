@@ -191,9 +191,33 @@ SSH sessions have a maximum expected duration of 10 hours. For more information,
 
 ## Troubleshooting
 
-If a user is having difficulty connecting to a target machine, it might be a policy or `sshd_config` file misconfiguration.
+Failure to connect to your SSH endpoint could be the result of multiple variables. Review the following troubleshooting steps to investigate and solve the source of your connection issue.
 
-## 1. Check target machine connection
+First, verify Access policy allows access.
+Second, verify tunnel health.
+- go to networks > routes > search your IP to find the tunnel associated with the IP.
+- copy the tunnel.
+- go to networks > tunnels, search by tunnel name and review that the tunnel status is "Healthy."
+
+If the status is anything other than healty, do this ____.
+
+Third, verify that the user you are attempting to connect as exists on the target.
+
+Fourth, check sshd_config file for misconfiguration.
+
+
+### 1. Review Access policies
+
+A user may be blocked by an Access policy from reaching an SSH target because:
+
+- An Access policy denies access, or
+- No explicit allow policy exist and Access is set to deny the user by default.
+
+As an end user, run [`warp-cli` target list`](/cloudflare-one/applications/non-http/infrastructure-apps/#display-available-targets) to verify if you have access to the target machine.
+
+
+
+### Check target machine connection
 
 A user may be blocked by a policy from reaching an SSH target because:
 
@@ -202,8 +226,14 @@ A user may be blocked by a policy from reaching an SSH target because:
 
 As an end user, run [`warp-cli` target list`](/cloudflare-one/applications/non-http/infrastructure-apps/#display-available-targets) to verify if you have access to the target machine.
 
-- If the target does not appear, the administrator should check the Access logs to confirm whether a policy is blocking access.
-- If the target appears in the list, the issue is likely with the `sshd_config` file.
+- If the target does not appear, your Access policies concerning the target machine must be audited for potential misconfigurations. the administrator should check the Access logs to confirm whether a policy is blocking access.
+
+- If the target appears in the list, confirm that the username you are attempting with is shown in the output. If the username is not shown, you must go to the Access policy associated with the target machine and add that user to the policy.
+
+then check tunnel health
+
+if you've checked tunnel health and there are no issues, then we assume > the issue is likely with the `sshd_config` file.
+
 
 ### 2. Review Access logs
 
@@ -229,6 +259,10 @@ By editing a [policy](/cloudflare-one/policies/access/) that is explicitly block
 ### 3. Debug `sshd_config` file misconfiguration
 
 Failure to connect to your SSH endpoint could be the result of multiple variables. One reason might be the result of a misconfigured `sshd_config` file.
+
+#### Review your `sshd` logs
+
+You will be told whether or not the user is making it to the server. The location of your sshd logs is defined in your `sshd_config`. // Mike to provide OS specific instructions.
 
 #### Review your `sshd_config` file for misconfigurations
 
