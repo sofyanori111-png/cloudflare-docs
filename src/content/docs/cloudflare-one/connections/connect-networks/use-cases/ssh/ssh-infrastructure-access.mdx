@@ -191,51 +191,29 @@ SSH sessions have a maximum expected duration of 10 hours. For more information,
 
 ## Troubleshooting
 
-Failure to connect to your SSH endpoint could be the result of multiple variables. Review the following troubleshooting steps to investigate and solve the source of your connection issue.
+Failure to connect to your SSH endpoint could be the result of multiple variables. Use the following steps to systematically investigate and resolve the source of your connection failure.
 
-First, verify Access policy allows access.
-Second, verify tunnel health.
-- go to networks > routes > search your IP to find the tunnel associated with the IP.
-- copy the tunnel.
-- go to networks > tunnels, search by tunnel name and review that the tunnel status is "Healthy."
-
-If the status is anything other than healty, do this ____.
-
-Third, verify that the user you are attempting to connect as exists on the target.
-
-Fourth, check sshd_config file for misconfiguration.
-
+1. [Verify that your Access policies](#1-review-access-policies) allow the user to access the target machine.
+2. [Check Cloudflare Tunnel](#2-check-target-machine-connection) health.
+3. [Confirm user existence](#3-confirm-user-existence-on-the-target-server) on the target server.
+4. [Check your `sshd_config` file](#4-debug-sshd_config-file-misconfiguration) for misconfiguration.
 
 ### 1. Review Access policies
 
 A user may be blocked by an Access policy from reaching an SSH target because:
 
-- An Access policy denies access, or
-- No explicit allow policy exist and Access is set to deny the user by default.
+- An Access policy exists that denies that user access, or
+- No explicit allow Access policy exists and Access is set to deny the user by default.
 
-As an end user, run [`warp-cli` target list`](/cloudflare-one/applications/non-http/infrastructure-apps/#display-available-targets) to verify if you have access to the target machine.
+You were guided to create an Access policy for your SSH target in [substep 9 of step 5: Add an infrastructure application](#5-add-an-infrastructure-application).
 
+As an end user, run [`warp-cli target list`](/cloudflare-one/applications/non-http/infrastructure-apps/#display-available-targets) to verify that you have access to the target machine.
 
+<Render file="tunnel/warp-cli-target-list" product="cloudflare-one" />
 
-### Check target machine connection
+- If the target appears in the list, confirm that the username you are attempting to connect with is shown in the output. If the username is not shown, you must go to the Access policy associated with the target machine and add that user to the Access policy. If the username is shown,
 
-A user may be blocked by a policy from reaching an SSH target because:
-
-- An Access policy denies access, or
-- No explicit allow policy exist and Access is set to deny the user by default.
-
-As an end user, run [`warp-cli` target list`](/cloudflare-one/applications/non-http/infrastructure-apps/#display-available-targets) to verify if you have access to the target machine.
-
-- If the target does not appear, your Access policies concerning the target machine must be audited for potential misconfigurations. the administrator should check the Access logs to confirm whether a policy is blocking access.
-
-- If the target appears in the list, confirm that the username you are attempting with is shown in the output. If the username is not shown, you must go to the Access policy associated with the target machine and add that user to the policy.
-
-then check tunnel health
-
-if you've checked tunnel health and there are no issues, then we assume > the issue is likely with the `sshd_config` file.
-
-
-### 2. Review Access logs
+- If the target does not appear in the list, your Access policies concerning the target machine must be audited for potential misconfigurations that may be blocking access.
 
 :::note
 
@@ -256,13 +234,42 @@ To review if an Access policy is causing connection issues:
 
 By editing a [policy](/cloudflare-one/policies/access/) that is explicitly blocking the user or adding a new policy to explicitly allow the user, the connection issue should be resolved. After saving your policy changes, attempt to connect to the target machine as the end user.
 
-### 3. Debug `sshd_config` file misconfiguration
+After you have audited your Access policies and are still having connection issues, you must review Tunnel health.
+
+### 2. Check target machine connection
+
+If the end user cannot connect to the target SSH machine, the tunnel you set up in [step 1: Connect the server to Cloudflare](#1-connect-the-server-to-cloudflare) may be down or inactive.
+
+To check the status of your Tunnel:
+
+1. In [Zero Trust](https://one.dash.cloudflare.com/), go to **Networks** > **Routes**.
+2. Search your IP to find the Tunnel associated with the IP.
+
+	This IP will be visible in the `warp-cli target list` output in [the previous step](#1-review-access-policies). If you are an admin, you can also go to **Networks** > **Targets** and find the IP next your Hostname.
+
+3. Copy the Tunnel name.
+4. Go to **Networks** > **Tunnels** and search by your Tunnel name.
+5. Review that the [Tunnel status](/cloudflare-one/connections/connect-networks/monitor-tunnels/notifications/#available-notifications) says Active, and not Down, Degraded, or Inactive.
+
+If the status of your Tunnel is Inactive, you must install and run the Tunnel on your server as described in [step 1: Connect the server to Cloudflare](#1-connect-the-server-to-cloudflare).
+
+If the status of your Tunnel is Down, the server could be turned off or the server was connected to Cloudflare at one point but is now no longer connected. This could be due to various changes on the server side, like firewalls, load balancers, or other network devices blocking `cloudflared` connections. Refer to the [Tunnel with Firewall](/cloudflare-one/connections/connect-networks/configure-tunnels/tunnel-with-firewall/#test-connectivity) or [Troubleshooting Tunnel documentation](/cloudflare-one/connections/connect-networks/troubleshoot-tunnels/) for more information.
+
+After you have vertified that there are no issues with your Tunnel's health, continue to verifying your `sshd_config` file.
+
+### 3. Confirm user existence on the target server
+
+To verify the existence of the end user on the target server, run the `id <USERNAME>` command on the target SSH server to verify that the end user's username exists. If the username does not exist, you must add the user to the server.
+
+### 4. Debug `sshd_config` file misconfiguration
 
 Failure to connect to your SSH endpoint could be the result of multiple variables. One reason might be the result of a misconfigured `sshd_config` file.
 
 #### Review your `sshd` logs
 
-You will be told whether or not the user is making it to the server. The location of your sshd logs is defined in your `sshd_config`. // Mike to provide OS specific instructions.
+`sshd` logs can confirm whether or not the user is making it to the server. The location of your `sshd` logs is defined in your `sshd_config`. Logs location will likely be found at `journalctl -u ssh` on Ubuntu and `tail /var/log/auth.log` for Red Hat.
+
+Using your `sshd` logs, validate that SSH connection attempts are arriving to the SSH target machine.
 
 #### Review your `sshd_config` file for misconfigurations
 
@@ -437,10 +444,10 @@ These troubleshooting steps could result in you being locked out of your SSH ser
 6. Enter `:x` to save and exit.
 7. [Reload](#reload-your-ssh-server) your SSH server.
 
-	:::caution[You may lose access to your SSH server]
-	Restarting your `sshd` service will result in the termination of your current SSH connection. Make sure your reload instead restarting to avoid losing access to your SSH server permanently.
+	:::caution[Do not restart]
+	Restarting your `sshd` service will result in the termination of your current SSH connection. Make sure to reload instead restarting to avoid terminating all currently open SSH sessions.
 	:::
 
 	<Render file="ssh/restart-server" product="cloudflare-one" />
 
-// Need a conclusion. What does this do? What if it still doesn't work?
+By completing these steps, you should have resolved any connection issues caused by misconfiguration of the SSH server. If issues persist, [recheck `sshd` logs](/cloudflare-one/connections/connect-networks/use-cases/ssh/ssh-infrastructure-access/#review-your-sshd-logs). The example [`sshd_config` shared above](/cloudflare-one/connections/connect-networks/use-cases/ssh/ssh-infrastructure-access/#review-your-sshd_config-file-for-misconfigurations) enables debug logging and may expose more specific issues.
