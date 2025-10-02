@@ -255,11 +255,13 @@ If the status of your Tunnel is Inactive, you must install and run the Tunnel on
 
 If the status of your Tunnel is Down, the server could be turned off or the server was connected to Cloudflare at one point but is now no longer connected. This could be due to various changes on the server side, like firewalls, load balancers, or other network devices blocking `cloudflared` connections. Refer to the [Tunnel with Firewall](/cloudflare-one/connections/connect-networks/configure-tunnels/tunnel-with-firewall/#test-connectivity) or [Troubleshooting Tunnel documentation](/cloudflare-one/connections/connect-networks/troubleshoot-tunnels/) for more information.
 
-After you have vertified that there are no issues with your Tunnel's health, continue to verifying your `sshd_config` file.
+After you have vertified that there are no issues with your Tunnel's health, continue to verifying the user's existence on the target machine.
 
 ### 3. Confirm user existence on the target server
 
 To verify the existence of the end user on the target server, run the `id <USERNAME>` command on the target SSH server to verify that the end user's username exists. If the username does not exist, you must add the user to the server.
+
+If the user exists on the target machine, continue to debugging the `sshd_config` file.
 
 ### 4. Debug `sshd_config` file misconfiguration
 
