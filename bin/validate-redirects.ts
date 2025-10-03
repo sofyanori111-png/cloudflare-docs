@@ -7,7 +7,7 @@ async function main() {
 	let numUrlsWithFragment = 0;
 	let numDuplicateRedirects = 0;
 	let numNonSlashedRedirects = 0;
-	
+
 	const validEndings = ["/", "*", ".xml", ".md", ".json", ".html"];
 
 	const redirectSourceUrls: string[] = [];
@@ -27,8 +27,7 @@ async function main() {
 			numUrlsWithFragment++;
 		}
 
-
-		if (!validEndings.some(ending => from.endsWith(ending))) {
+		if (!validEndings.some((ending) => from.endsWith(ending))) {
 			console.log(`✘ Found unslashed source URLs:\n    ${from}`);
 			numNonSlashedRedirects++;
 		}
