@@ -215,22 +215,27 @@ As an end user, run [`warp-cli target list`](/cloudflare-one/applications/non-ht
 
 - If the target does not appear in the list, your Access policies concerning the target machine must be audited for potential misconfigurations that may be blocking access.
 
+To review if an Access policy is causing connection issues:
+
 :::note
 
 You will need Cloudflare dashboard access and log view [permissions](/cloudflare-one/roles-permissions/) to proceed with this step.
 
 :::
 
-To review if an Access policy is causing connection issues:
+1. In [Zero Trust](https://one.dash.cloudflare.com/), go to **Logs** > **Access**.
 
-1. Log in to [Zero Trust](https://one.dash.cloudflare.com/).
-2. Go to **Logs** > **Access**.
-3. Select the application you are testing or filter by _Infrastructure_ App Type.
-4. Review the **Decision**. If the **Decision** is not Access granted, select the application and copy the name under App.
-5. Go to **Access** > **Applications**.
-6. Input the app name in the search bar and select the application.
-7. Select **Configure**.
-8. Go to **Policies** to review what criteria may be blocking the user.
+2. Select the application you are testing or filter _Infrastructure_ as the App Type.
+
+3. Review the **Decision**. If the **Decision** is `Access denied`, select the application and copy the name under App.
+
+4. Go to **Access** > **Applications**.
+
+5. Input the app name in the search bar and select the application.
+
+6. Select **Configure**.
+
+7. Go to **Policies** to review what criteria may be blocking the user.
 
 By editing a [policy](/cloudflare-one/policies/access/) that is explicitly blocking the user or adding a new policy to explicitly allow the user, the connection issue should be resolved. After saving your policy changes, attempt to connect to the target machine as the end user.
 
@@ -253,9 +258,11 @@ To check the status of your Tunnel:
 
 If the status of your Tunnel is Inactive, you must install and run the Tunnel on your server as described in [step 1: Connect the server to Cloudflare](#1-connect-the-server-to-cloudflare).
 
-If the status of your Tunnel is Down, the server could be turned off or the server was connected to Cloudflare at one point but is now no longer connected. This could be due to various changes on the server side, like firewalls, load balancers, or other network devices blocking `cloudflared` connections. Refer to the [Tunnel with Firewall](/cloudflare-one/connections/connect-networks/configure-tunnels/tunnel-with-firewall/#test-connectivity) or [Troubleshooting Tunnel documentation](/cloudflare-one/connections/connect-networks/troubleshoot-tunnels/) for more information.
+If the status of your Tunnel is Down, the server could be turned off or the server was connected to Cloudflare at one point but is now no longer connected. This could be due to various changes on the server side, like firewall configuration, load balancer interference, or other network devices blocking `cloudflared` connections.
 
-After you have vertified that there are no issues with your Tunnel's health, continue to verifying the user's existence on the target machine.
+Refer to the [Tunnel with Firewall](/cloudflare-one/connections/connect-networks/configure-tunnels/tunnel-with-firewall/#test-connectivity) or [Troubleshooting Tunnel documentation](/cloudflare-one/connections/connect-networks/troubleshoot-tunnels/) for more information.
+
+After you have vertified that there are no issues with your Tunnel's health, continue to verifying the user's existence on the target SSH server.
 
 ### 3. Confirm user existence on the target server
 
@@ -265,7 +272,7 @@ If the user exists on the target machine, continue to debugging the `sshd_config
 
 ### 4. Debug `sshd_config` file misconfiguration
 
-Failure to connect to your SSH endpoint could be the result of multiple variables. One reason might be the result of a misconfigured `sshd_config` file.
+One reason a user is failing to connect to your SSH endpoint might be the result of a misconfigured `sshd_config` file. Follow the steps below to audit your `sshd_config` file for misconfigurations.
 
 #### Review your `sshd` logs
 
