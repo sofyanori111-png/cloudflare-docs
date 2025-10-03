@@ -1,5 +1,4 @@
 # homepage
-/api /api/ 301
 /docs/ /directory/ 301
 /products/ /directory/ 301
 /zero-trust/ /products/?product-group=Cloudflare+One 301
