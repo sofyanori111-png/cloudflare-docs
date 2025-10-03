@@ -27,7 +27,8 @@ async function main() {
 			numUrlsWithFragment++;
 		}
 
-		if (!from.endsWith("/") && !from.endsWith("*") && !from.endsWith(".xml")) {
+
+		if (!validEndings.some(ending => from.endsWith(ending))) {
 			console.log(`✘ Found unslashed source URLs:\n    ${from}`);
 			numNonSlashedRedirects++;
 		}
