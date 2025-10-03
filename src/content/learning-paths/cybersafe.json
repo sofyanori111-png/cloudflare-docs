@@ -3,6 +3,7 @@
 	"path": "/learning-paths/cybersafe/concepts/",
 	"priority": 5,
 	"description": "Prevent children from accessing obscene or harmful content over the Internet. Go to [Project Cybersafe Schools](https://www.cloudflare.com/lp/cybersafe-schools/) to apply.",
+	"pcx_content_type": "learning-path",
 	"products": ["Cloudflare Gateway", "WARP", "DNS"],
 	"product_group": "Cloudflare One",
 	"additional_groups": ["Application security"]

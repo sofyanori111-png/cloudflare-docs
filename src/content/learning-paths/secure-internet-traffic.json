@@ -2,7 +2,8 @@
 	"title": "Secure your Internet traffic and SaaS apps",
 	"path": "/learning-paths/secure-internet-traffic/concepts/",
 	"priority": 2,
-	"description": "Provide your users and networks with a secure, performant, and flexible path to the Internet.",
-	"products": ["DNS", "Gateway", "CASB", "DLP", "Browser Isolation"],
+	"description": "Learn how to secure Internet traffic with Cloudflare Gateway.",
+	"pcx_content_type": "learning-path",
+	"products": ["Gateway"],
 	"product_group": "Cloudflare One"
 }

@@ -11,6 +11,7 @@ export const streamSchema = z.object({
 	chapters: z.record(z.string(), z.string()).optional(),
 	tags: z.array(z.string()).optional(),
 	updated: z.date().optional(),
+	pcx_content_type: z.string().default("video"),
 	thumbnail: z
 		.object({
 			url: z.string(),

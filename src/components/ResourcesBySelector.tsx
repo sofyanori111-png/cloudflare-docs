@@ -81,7 +81,9 @@ export default function ResourcesBySelector({
 		// Handle left sidebar filters
 		if (filterPlacement === "left" && filters) {
 			// Check each filterable field separately
-			for (const [filterField, selectedValues] of Object.entries(leftFilters.selectedValues)) {
+			for (const [filterField, selectedValues] of Object.entries(
+				leftFilters.selectedValues,
+			)) {
 				if (selectedValues.length > 0) {
 					const resourceValues: string[] = [];
 					const val = resource.data[filterField as keyof typeof resource.data];
@@ -125,7 +127,7 @@ export default function ResourcesBySelector({
 			// Handle left sidebar URL params
 			const searchTerm = params.get("search-term") ?? "";
 			const selectedValues: Record<string, string[]> = {};
-			
+
 			// Get values for each filterable field from URL params
 			if (filters) {
 				for (const filter of filters) {
@@ -155,7 +157,9 @@ export default function ResourcesBySelector({
 			}
 
 			// Add URL params for each filterable field
-			for (const [filterField, selectedValues] of Object.entries(leftFilters.selectedValues)) {
+			for (const [filterField, selectedValues] of Object.entries(
+				leftFilters.selectedValues,
+			)) {
 				selectedValues.forEach((value) =>
 					params.append(`filter-${filterField}`, value),
 				);
@@ -187,7 +191,9 @@ export default function ResourcesBySelector({
 					{Object.entries(facets).map(([filterField, values]) => (
 						<div key={filterField} className="mb-8! hidden md:block">
 							<span className="text-sm font-bold text-gray-600 uppercase dark:text-gray-200">
-								{filterField.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+								{filterField
+									.replace(/_/g, " ")
+									.replace(/\b\w/g, (l) => l.toUpperCase())}
 							</span>
 
 							{values.map((value) => (
@@ -196,9 +202,14 @@ export default function ResourcesBySelector({
 										type="checkbox"
 										className="mr-2"
 										value={value}
-										checked={leftFilters.selectedValues[filterField]?.includes(value) || false}
+										checked={
+											leftFilters.selectedValues[filterField]?.includes(
+												value,
+											) || false
+										}
 										onChange={(e: ChangeEvent<HTMLInputElement>) => {
-											const currentValues = leftFilters.selectedValues[filterField] || [];
+											const currentValues =
+												leftFilters.selectedValues[filterField] || [];
 											if (e.target.checked) {
 												setLeftFilters({
 													...leftFilters,
@@ -259,7 +270,7 @@ export default function ResourcesBySelector({
 				)}
 
 				<div
-					className={`grid ${columns === 2 ? "md:grid-cols-2" : "md:grid-cols-3"} grid-cols-1 gap-4`}
+					className={`grid ${columns === 1 ? "md:grid-cols-1" : columns === 2 ? "md:grid-cols-2" : "md:grid-cols-3"} grid-cols-1 gap-4`}
 				>
 					{visibleResources.map((page) => {
 						const href =
