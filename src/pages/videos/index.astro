@@ -15,5 +15,11 @@ const props = {
 ---
 
 <StarlightPage {...props}>
-	<ResourcesBySelector types={["stream"]} columns={3} />
+	<ResourcesBySelector
+		directory="workers/"
+		types={["example", "tutorial"]}
+		filterables={["pcx_content_type", "tags"]}
+		filterPlacement="left"
+		columns={3}
+	/>
 </StarlightPage>
